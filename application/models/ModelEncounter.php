@@ -1,0 +1,75 @@
+<?php
+    class ModelEncounter extends CI_Model{
+
+        function poliklinik($env){
+            $query =
+                    "
+                        SELECT X.*
+                        FROM(
+                            SELECT A.PASIEN_ID, EPISODE_ID, POLI_ID, DOKTER_ID,
+                                (
+                                    SELECT LISTAGG(ICD10_ID||';'||DIAGNOSA, '|')WITHIN GROUP (ORDER BY JENIS ASC, DIAGNOSA ASC)
+                                    FROM SR01_RM_RESUME_ICD10
+                                    WHERE LOKASI_ID='001'
+                                    AND   AKTIF='1'
+                                    AND   JNS_R='F'
+                                    AND   TIPE='IDRG'
+                                    AND   EPISODE_ID=A.EPISODE_ID
+                                )CONDITION,
+
+                                --Patient Index
+                                SR01_GET_SUFFIX(A.PASIEN_ID)PATIENTNAME,
+                                (SELECT INT_PASIEN_ID FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTMR,
+                                (SELECT SATUSEHAT_ID  FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTID,
+
+                                --Location
+                                (SELECT SATUSEHAT_ID  FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=A.POLI_ID)LOCATIONID,
+                                (SELECT NAME          FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=A.POLI_ID)LOCATIONNAME,
+
+                                --Practitioner Index
+                                (SELECT IHS_ID      FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND DOKTER_ID=A.DOKTER_ID)PRACTITIONERID,
+                                (SELECT UPPER(NAMA) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND DOKTER_ID=A.DOKTER_ID)PRACTITIONERNAME,
+
+                                --Status History
+                                (SELECT DISTINCT TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' FROM WEB_CO_REGISTRASI_ONLINE_HD WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)PLANNED,
+                                (SELECT DISTINCT TO_CHAR(TGL_HADIR- INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(TGL_HADIR- INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00'       FROM WEB_CO_REGISTRASI_ONLINE_HD WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID )PERIODSTART,
+                                (SELECT DISTINCT TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' FROM SR01_MED_PRWT_TR WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)TRIAGE,
+                                (SELECT DISTINCT TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' FROM WEB_CO_MULAI_PERIKSA     WHERE SHOW_ITEM='1' AND CREATED_DATE=(SELECT MIN(CREATED_DATE) FROM WEB_CO_MULAI_PERIKSA   WHERE SHOW_ITEM='1' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)INPROGRESSSTART,
+                                (SELECT DISTINCT TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE- INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' FROM WEB_CO_SELESAI_PERIKSA   WHERE SHOW_ITEM='1' AND CREATED_DATE=(SELECT MAX(CREATED_DATE) FROM WEB_CO_SELESAI_PERIKSA WHERE SHOW_ITEM='1' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)INPROGRESSEND,
+
+                                CASE
+                                    WHEN TGL_KELUAR < TRUNC(LAST_UPDATED_DATE) THEN
+                                    TO_CHAR(LAST_UPDATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(LAST_UPDATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00'
+                                    ELSE
+                                    TO_CHAR(TGL_KELUAR - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(TGL_KELUAR - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00'
+                                END FINISH
+                                                        
+                            FROM SR01_KEU_EPISODE A
+                            WHERE A.LOKASI_ID     = '001'
+                            AND A.AKTIF           = '1'
+                            --AND A.EPISODE_ID      = 'B125092866840'
+                            AND A.JENIS_EPISODE   = 'O'
+                            AND A.STATUS_EPISODE  = '55'
+                            AND A.TGL_KELUAR IS NOT NULL
+                            AND TRUNC(A.TGL_MASUK) >= (SELECT TRUNC(SATUSEHAT_DATE) FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND ACC_SATUSEHAT='Y' AND SATUSEHAT_ID IS NOT NULL AND PASIEN_ID=A.PASIEN_ID)
+                            AND A.POLI_ID NOT IN ('UGD01','UGD02','MEDIC0000000000','POLI0000000039','HEMOD0000000000')
+                            AND EXISTS (SELECT 1 FROM SR01_GEN_PASIEN_MS P WHERE P.LOKASI_ID='001' AND P.AKTIF='1' AND P.ACC_SATUSEHAT='Y' AND P.SATUSEHAT_ID IS NOT NULL AND P.SATUSEHAT_ID NOT IN ('NOT FOUND','X') AND P.ACC_SATUSEHAT_FASKES IS NOT NULL AND P.PASIEN_ID=A.PASIEN_ID)
+                            AND EXISTS (SELECT 1 FROM SR01_SATUSEHAT_LOCATION L WHERE L.LOKASI_ID='001' AND L.AKTIF='1' AND L.STATUS='active' AND L.VALUE=A.POLI_ID)
+                            AND EXISTS (SELECT 1 FROM SR01_GEN_USER_DATA U WHERE U.LOKASI_ID='001' AND U.AKTIF='1' AND U.IHS_ID IS NOT NULL AND U.IHS_ID <> 'NOT FOUND' AND U.DOKTER_ID=A.DOKTER_ID)
+                            AND EXISTS (SELECT 1 FROM SR01_RESUME_MEDIS R WHERE R.LOKASI_ID='001' AND R.AKTIF IN ('1','2') AND R.APPROVE_DR='Y' AND R.IS_CASEMIX='Y' AND R.EPISODE_ID=A.EPISODE_ID)
+                            --AND EXISTS (SELECT 1 FROM SR01_DOCUMENT D WHERE D.LOKASI_ID='001' AND D.SHOW_ITEM='1' AND D.JNS_DOC='RMD' AND D.PASIEN_ID=A.PASIEN_ID AND D.EPISODE_ID=A.EPISODE_ID)
+                            --AND EXISTS (SELECT 1 FROM WEB_CO_REGISTRASI_ONLINE_HD W WHERE W.LOKASI_ID='001' AND W.AKTIF='1' AND W.TGL_HADIR IS NOT NULL AND W.PASIEN_ID=A.PASIEN_ID AND W.EPISODE_ID=A.EPISODE_ID)
+                            AND NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+                            
+                            ORDER BY TGL_MASUK DESC
+                        )X
+                        WHERE X.CONDITION IS NOT NULL
+                        FETCH FIRST 1 ROWS ONLY
+                    ";
+
+			$recordset = $this->db->query($query);
+			$recordset = $recordset->result();
+			return $recordset;
+        }
+    }
+?>

@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "scripts": {
+		"satusehat"     : "node nodejs/service.js"
+	},
+  "dependencies": {
+    "axios": "^1.12.2",
+    "chalk": "^5.6.2",
+    "node-fetch": "^3.3.2"
+  }
+}
