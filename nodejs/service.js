@@ -111,15 +111,15 @@ async function callAPI(endpoint, method = "GET", body = null) {
 }
 
 async function runservices(){
-	await callAPI("patientid", "POST");
+	await callAPI("orderrad", "POST");
 }
 
-async function runservicesbundle(){
-	await callAPI("poliklinik", "POST");
-}
+// async function runservicesbundle(){
+// 	await callAPI("poliklinik", "POST");
+// }
 
 console.clear();
-// runservices();
+runservices();
 // runservicesbundle();
 setInterval(runservices, 5000);
-setInterval(runservicesbundle, 10000);
+// setInterval(runservicesbundle, 10000);

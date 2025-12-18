@@ -21,4 +21,5 @@
 
     $route['patientid']  = 'restapi/Patient/patientid';
     $route['poliklinik'] = 'restapi/Encounter/poliklinik';
+    $route['orderrad']   = 'restapi/Servicerequest/orderrad';
 ?>

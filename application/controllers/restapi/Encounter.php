@@ -52,9 +52,21 @@
                 $result = $this->md->poliklinik(SERVER);
                 if(!empty($result)){
                     foreach ($result as $a){
-                        $statusColor   = "";
-                        $statusMsg     = "";
-                        $uuidencounter = "";
+                        $statusColor      = "";
+                        $statusMsg        = "";
+                        $patientid        = "";
+                        $mrpas            = "";
+                        $patientname      = "";
+                        $practitionerid   = "";
+                        $practitionername = "";
+                        $locationid       = "";
+                        $locationname     = "";
+                        $pasienid         = "";
+                        $episodeid        = "";
+                        $poliid           = "";
+                        $dokterid         = "";
+                        $uuidencounter    = "";
+
 
                         $body                     = [];
                         $encounter                = [];
@@ -74,10 +86,6 @@
 
                         $uuidencounter = Satusehat::uuid();
 
-                        $pasienid  = "";
-                        $episodeid = "";
-                        $poliid    = "";
-                        $dokterid  = "";
                         $pasienid  = $a->PASIEN_ID;
                         $episodeid = $a->EPISODE_ID;
                         $poliid    = $a->POLI_ID;
