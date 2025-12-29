@@ -69,6 +69,7 @@
                         $acsn                = "";
                         $layanid             = "";
                         $dokterid            = "";
+                        $identifier          = "";
                         $uuidservicerequest  = "";
 
                         $body                                     = [];
@@ -89,13 +90,14 @@
 
                         $uuidservicerequest = Satusehat::uuid();
 
-                        $pasienid  = $a->PASIEN_ID;
-                        $episodeid = $a->EPISODE_ID;
-                        $poliid    = $a->POLI_ID;
-                        $transco   = $a->TRANS_CO;
-                        $acsn      = $a->TRANS_RAD;
-                        $layanid   = $a->TEST_ID;
-                        $dokterid  = $a->DOKTER_ID;
+                        $pasienid   = $a->PASIEN_ID;
+                        $episodeid  = $a->EPISODE_ID;
+                        $poliid     = $a->POLI_ID;
+                        $transco    = $a->TRANS_CO;
+                        $acsn       = $a->TRANS_RAD;
+                        $layanid    = $a->TEST_ID;
+                        $dokterid   = $a->DOKTER_ID;
+                        $identifier = $a->TRANS_CO."-".$a->TEST_ID;
 
                         if(SERVER === "production"){
                             $patientid           = $a->PATIENTID;
@@ -137,7 +139,7 @@
                         $servicerequestresourcecode['code']                    = $a->LOINCCODE;
                         $servicerequestresourcecode['display']                 = $a->LOINCDESC;
                         $servicerequestresourceidentifier1['system']           = "http://sys-ids.kemkes.go.id/servicerequest/".RS_ID;
-                        $servicerequestresourceidentifier1['value']            = $transco."-".$a->TEST_ID;
+                        $servicerequestresourceidentifier1['value']            = $identifier;
                         $servicerequestresourceidentifier2['system']           = "http://sys-ids.kemkes.go.id/acsn/".RS_ID;
                         $servicerequestresourceidentifier2['type']['coding'][] = $servicerequestresourceidentifier2type;
                         $servicerequestresourceidentifier2['use']              = "usual";
@@ -177,11 +179,7 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $servicerequest;
 
-                        // $this->response($servicerequestresource);
-
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
-
-                        // $this->response($response);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -194,17 +192,19 @@
                                 $simpanlog['TRANS_CO']      = $transco;
                                 $simpanlog['ACSN']          = $acsn;
                                 $simpanlog['LAYAN_ID']      = $layanid;
+                                $simpanlog['IDENTIFIER']    = $identifier;
                                 $simpanlog['LOCATION']      = $entrys['response']['location'];
                                 $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
                                 $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
                                 $simpanlog['ETAG']          = $entrys['response']['etag'];
                                 $simpanlog['STATUS']        = $entrys['response']['status'];
                                 $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                $simpanlog['JENIS']         = "1";
                                 $simpanlog['ENVIRONMENT']   = SERVER;
                                 $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                $simpanlog['JENIS']         = "1";
     
                                 $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
+                               
                                 if(empty($resultcekdataresouce)){
                                     $this->mss->insertdata($simpanlog);
                                 }
@@ -258,7 +258,7 @@
 
                                     if(isset($response['issue'])){
                                         if($response['issue'][0]['code']==="duplicate"){
-                                            $responsegetServiceRequest          = [];
+                                            $responsegetServiceRequest = [];
                                             $parameter                 = "http://sys-ids.kemkes.go.id/acsn/".RS_ID."|".$acsn;
                                             $responsegetServiceRequest = Satusehat::getdata("ServiceRequest","identifier",$parameter,self::$oauth['access_token']);
 
@@ -273,6 +273,7 @@
                                                     $simpanlog['TRANS_CO']      = $transco;
                                                     $simpanlog['LAYAN_ID']      = $layanid;
                                                     $simpanlog['ACSN']          = $acsn;
+                                                    $simpanlog['IDENTIFIER']    = $identifier;
                                                     $simpanlog['LOCATION']      = $responsegetServiceRequests['fullUrl']."/_history/".trim($responsegetServiceRequests['resource']['meta']['versionId'], 'W/"');
                                                     $simpanlog['RESOURCE_TYPE'] = $responsegetServiceRequests['resource']['resourceType'];
                                                     $simpanlog['RESOURCE_ID']   = $responsegetServiceRequests['resource']['id'];

@@ -83,6 +83,7 @@
                         $statusHistoryperiodstart = [];
                         $statusHistoryplanned     = [];
                         $conditiondiag            = [];
+                        $resultcekdataresouce     = [];
 
                         $uuidencounter = Satusehat::uuid();
 
@@ -244,8 +245,6 @@
                         $body['entry'][]      = $encounter;
                         $body['entry']        = array_merge($body['entry'], $conditiondiag);
 
-                        // $this->response($body);
-
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
                         if(isset($response['entry'])){
@@ -256,19 +255,19 @@
                                 $simpanlog['EPISODE_ID']    = $episodeid;
                                 $simpanlog['POLI_ID']       = $poliid;
                                 $simpanlog['DOKTER_ID']     = $dokterid;
+                                $simpanlog['IDENTIFIER']    = $episodeid;
                                 $simpanlog['LOCATION']      = $entrys['response']['location'];
                                 $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
                                 $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
                                 $simpanlog['ETAG']          = $entrys['response']['etag'];
                                 $simpanlog['STATUS']        = $entrys['response']['status'];
                                 $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                $simpanlog['JENIS']         = "1";
                                 $simpanlog['ENVIRONMENT']   = SERVER;
                                 $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                if($entrys['response']['resourceType']==="Condition"){
-                                    $simpanlog['JENIS']    = "1";
-                                }
     
                                 $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
+
                                 if(empty($resultcekdataresouce)){
                                     $this->mss->insertdata($simpanlog);
                                 }
@@ -337,16 +336,19 @@
                                                     $simpanlog['EPISODE_ID']    = $episodeid;
                                                     $simpanlog['POLI_ID']       = $poliid;
                                                     $simpanlog['DOKTER_ID']     = $dokterid;
+                                                    $simpanlog['IDENTIFIER']    = $episodeid;
                                                     $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
                                                     $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
                                                     $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
                                                     $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
                                                     $simpanlog['STATUS']        = "201 Created";
                                                     $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
+                                                    $simpanlog['JENIS']         = "1";
                                                     $simpanlog['ENVIRONMENT']   = SERVER;
                                                     $simpanlog['CREATED_BY']    = "MIDDLEWARE";
                                                     
                                                     $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
+
                                                     if(empty($resultcekdataresouce)){
                                                         $this->mss->insertdata($simpanlog);
                                                     }
@@ -365,17 +367,19 @@
                                                     $simpanlog['EPISODE_ID']    = $episodeid;
                                                     $simpanlog['POLI_ID']       = $poliid;
                                                     $simpanlog['DOKTER_ID']     = $dokterid;
+                                                    $simpanlog['IDENTIFIER']    = $episodeid;
                                                     $simpanlog['LOCATION']      = $responsegetconditions['fullUrl']."/_history/".trim($responsegetconditions['resource']['meta']['versionId'], 'W/"');
                                                     $simpanlog['RESOURCE_TYPE'] = $responsegetconditions['resource']['resourceType'];
                                                     $simpanlog['RESOURCE_ID']   = $responsegetconditions['resource']['id'];
                                                     $simpanlog['ETAG']          = 'W/"' . $responsegetconditions['resource']['meta']['versionId'] . '"';
                                                     $simpanlog['STATUS']        = "201 Created";
                                                     $simpanlog['LAST_MODIFIED'] = $responsegetconditions['resource']['meta']['lastUpdated'];
+                                                    $simpanlog['JENIS']         = "1";
                                                     $simpanlog['ENVIRONMENT']   = SERVER;
                                                     $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                                    $simpanlog['JENIS']         = "1";
-                        
+                                                    
                                                     $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id']);
+
                                                     if(empty($resultcekdataresouce)){
                                                         $this->mss->insertdata($simpanlog);
                                                     }

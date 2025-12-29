@@ -65,24 +65,32 @@
                         $namapasien  = $a->NAMA;
                         $concentdate = $a->SATUSEHAT_DATE;
 
-                        $response = Satusehat::getpatientid($noidentitas,self::$oauth['access_token']);
-                        if(isset($response['entry'][0]['resource']['id'])){
-                            $satusehatid = $response['entry'][0]['resource']['id'];
+                        if(SERVER==="production"){
+                            $response = Satusehat::getpatientid($noidentitas,self::$oauth['access_token']);
+                            if(isset($response['entry'][0]['resource']['id'])){
+                                $satusehatid = $response['entry'][0]['resource']['id'];
 
-                            $statusColor = "green";
-                            $statusMsg   = "OK";
+                                $statusColor = "green";
+                                $statusMsg   = "OK";
 
-                            $data['SATUSEHAT_ID']=$satusehatid;
+                                $data['SATUSEHAT_ID']=$satusehatid;
+                            }else{
+                                $satusehatid = "NOT FOUND";
+
+                                $statusColor = "red";
+                                $statusMsg   = "NOT FOUND";
+
+                                $data['SATUSEHAT_ID']=$satusehatid;
+                            }
+
+                            $this->md->updatedatapatient($pasienid,$data);
                         }else{
-                            $satusehatid = "NOT FOUND";
+                            $satusehatid = "MODE ENVIRONTMENT SANDBOX";
 
                             $statusColor = "red";
-                            $statusMsg   = "NOT FOUND";
-
-                            $data['SATUSEHAT_ID']=$satusehatid;
+                            $statusMsg   = "MODE ENVIRONTMENT SANDBOX";
                         }
-
-                        $this->md->updatedatapatient($pasienid,$data);
+                        
                         echo formatlogpasien($pasienid,$noidentitas,$namapasien,$concentdate,$satusehatid,$statusMsg,$statusColor);
                     }
                 }else{

@@ -10,6 +10,24 @@
             return $sql;
         }
 
+        // function cekdatasatusehat($env,$episodeid,$resourcetype,$identifier){
+        //     $query =
+        //             "
+        //                 SELECT A.RESOURCE_ID
+        //                 FROM SR01_SATUSEHAT_TRANSAKSI A
+        //                 WHERE A.LOKASI_ID='001'
+        //                 AND   A.AKTIF='1'
+        //                 AND   A.ENVIRONMENT='".$env."'
+        //                 AND   A.RESOURCE_TYPE='".$resourcetype."'
+        //                 AND   A.EPISODE_ID='".$episodeid."'
+        //                 AND   A.IDENTIFIER='".$identifier."'
+        //             ";
+
+		// 	$recordset = $this->db->query($query);
+		// 	$recordset = $recordset->result();
+		// 	return $recordset;
+        // }
+
         function cekdataresouce($env,$resourcetype,$resourceid){
             $query =
                     "

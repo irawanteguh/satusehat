@@ -1,0 +1,34 @@
+<?php
+    class ModelObservation extends CI_Model{
+
+        function AnamnesaawalRJ($env){
+            $query =
+                    "
+                        SELECT X.*,
+                            --Location
+                            (SELECT SATUSEHAT_ID  FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=X.POLI_ID)LOCATIONID,
+                            (SELECT NAME          FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=X.POLI_ID)LOCATIONNAME
+                        FROM(
+                            SELECT A.PASIEN_ID, EPISODE_ID, TRANS_ID, TV_FREK_NADI, TV_FREK_NAFAS, TV_TEKANAN_DARAH, TV_TEKANAN_DARAH2, TV_SUHU, ANT_BB, ANT_TB, ANT_IMT,
+                                (SELECT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)RESOURCE_ID,
+                                (SELECT POLI_ID     FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)POLI_ID,
+                                (SELECT DOKTER_ID   FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)DOKTER_ID,
+                                TO_CHAR(CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' TRIAGE
+                            FROM SR01_MED_ANAMAWAL A
+                            WHERE A.LOKASI_ID='001'
+                            AND   A.AKTIF='1'
+                            AND   A.CREATED_DATE =(SELECT DISTINCT MAX(CREATED_DATE) FROM SR01_MED_ANAMAWAL WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)
+                            AND   A.CREATED_BY   =(SELECT 'SIRS01_'||UPPER(USER_ID) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND IHS_ID IS NOT NULL AND IHS_ID<>'NOT FOUND' AND 'SIRS01_'||UPPER(USER_ID)=UPPER(A.CREATED_BY))
+                            AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+                            AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Observation' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+                            ORDER BY CREATED_DATE DESC
+                            FETCH FIRST 1 ROWS ONLY
+                        )X
+                    ";
+
+			$recordset = $this->db->query($query);
+			$recordset = $recordset->result();
+			return $recordset;
+        }
+    }
+?>

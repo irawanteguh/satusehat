@@ -47,7 +47,6 @@
                             FROM SR01_KEU_EPISODE A
                             WHERE A.LOKASI_ID     = '001'
                             AND A.AKTIF           = '1'
-                            --AND A.EPISODE_ID      = 'B125092866840'
                             AND A.JENIS_EPISODE   = 'O'
                             AND A.STATUS_EPISODE  = '55'
                             AND A.TGL_KELUAR IS NOT NULL
@@ -59,11 +58,12 @@
                             AND EXISTS (SELECT 1 FROM SR01_RESUME_MEDIS R WHERE R.LOKASI_ID='001' AND R.AKTIF IN ('1','2') AND R.APPROVE_DR='Y' AND R.IS_CASEMIX='Y' AND R.EPISODE_ID=A.EPISODE_ID)
                             --AND EXISTS (SELECT 1 FROM SR01_DOCUMENT D WHERE D.LOKASI_ID='001' AND D.SHOW_ITEM='1' AND D.JNS_DOC='RMD' AND D.PASIEN_ID=A.PASIEN_ID AND D.EPISODE_ID=A.EPISODE_ID)
                             --AND EXISTS (SELECT 1 FROM WEB_CO_REGISTRASI_ONLINE_HD W WHERE W.LOKASI_ID='001' AND W.AKTIF='1' AND W.TGL_HADIR IS NOT NULL AND W.PASIEN_ID=A.PASIEN_ID AND W.EPISODE_ID=A.EPISODE_ID)
-                            AND NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+                            AND NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
                             
                             ORDER BY TGL_MASUK DESC
                         )X
                         WHERE X.CONDITION IS NOT NULL
+                        AND   X.INPROGRESSEND IS NOT NULL
                         FETCH FIRST 1 ROWS ONLY
                     ";
 

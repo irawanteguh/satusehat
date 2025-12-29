@@ -2,8 +2,11 @@ import os from "os";
 import fetch from "node-fetch";
 import chalk from "chalk";
 
-let lebar = 180;
-let host  = "localhost";
+let lebar                   = 180;
+let host                    = "localhost";
+let isRunningServices       = false;
+let isRunningServicesBundle = false;
+
 
 const interfaces = os.networkInterfaces();
 for (const iface of Object.values(interfaces)) {
@@ -110,16 +113,48 @@ async function callAPI(endpoint, method = "GET", body = null) {
 	}
 }
 
-async function runservices(){
-	await callAPI("orderrad", "POST");
+function Waiting(endpoint) {
+	logHeader();
+	logRow(getTimeStamp(),"WAIT",endpoint,"WAITING","Proses sebelumnya masih berjalan","yellow");
 }
 
-// async function runservicesbundle(){
-// 	await callAPI("poliklinik", "POST");
-// }
+
+async function runservices(){
+	if (isRunningServices) {
+		Waiting("patientid");
+		return;
+	}
+
+	isRunningServices = true;
+	try {
+		await callAPI("patientid", "POST");
+	} finally {
+		isRunningServices = false;
+	}
+}
+
+
+
+async function runservicesbundle(){
+	if (isRunningServicesBundle) {
+		Waiting("bundle-services");
+		return;
+	}
+
+	isRunningServicesBundle = true;
+	try {
+		await callAPI("poliklinik", "POST");
+		await callAPI("anamnesaawalrj", "POST");
+		await callAPI("orderrad", "POST");
+		await callAPI("dicom", "POST");
+	} finally {
+		isRunningServicesBundle = false;
+	}
+}
+
 
 console.clear();
 runservices();
-// runservicesbundle();
+runservicesbundle();
 setInterval(runservices, 5000);
-// setInterval(runservicesbundle, 10000);
+setInterval(runservicesbundle, 20000);

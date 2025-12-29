@@ -19,7 +19,11 @@
     // $route['hasillab']            = 'restapi/Observation/hasillab';
     // $route['diagnosticreportlab'] = 'restapi/Diagnosticreport/diagnosticreportlab';
 
-    $route['patientid']  = 'restapi/Patient/patientid';
-    $route['poliklinik'] = 'restapi/Encounter/poliklinik';
-    $route['orderrad']   = 'restapi/Servicerequest/orderrad';
+    
+
+    $route['patientid']      = 'restapi/Patient/patientid';
+    $route['poliklinik']     = 'restapi/Encounter/poliklinik';
+    $route['anamnesaawalrj'] = 'restapi/Observation/anamnesaawalrj';
+    $route['orderrad']       = 'restapi/Servicerequest/orderrad';
+    $route['dicom']          = 'restapi/Imagestudy/dicom';
 ?>
