@@ -262,7 +262,7 @@
                     echo color('red')."Data Tidak Ditemukan";
                 }
             }else{
-                echo color('red').self::$oauth['issue'];
+                echo color('red').self::$oauth['issue'][0]['details']['text'];
             }
         }
         
