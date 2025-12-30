@@ -56,7 +56,6 @@ function logRow(timestamp, method, endpoint, status, message, statusColor = "gre
 	);
 }
 
-
 async function callAPI(endpoint, method = "GET", body = null) {
 	const url = `${BASE_URL}${endpoint}`;
 	const options = {
@@ -92,7 +91,7 @@ async function callAPI(endpoint, method = "GET", body = null) {
 				timestamp,
 				method,
 				endpoint,
-				response.status,
+				`${response.statusText} | ${url}`,
 				"OK"
 			);
 			console.log(chalk.gray(JSON.stringify(data, null, 2)));
