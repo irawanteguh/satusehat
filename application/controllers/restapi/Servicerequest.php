@@ -355,7 +355,7 @@
                         $transco    = $a->TRANS_CO;
                         $layanid    = $a->TEST_ID;
                         $dokterid   = $a->DOKTER_ID;
-                        $identifier = $a->TRANS_CO;
+                        $identifier = $a->TRANS_CO."-".$a->TEST_ID;
 
                         if(SERVER === "production"){
                             $patientid           = $a->PATIENTID;
