@@ -309,6 +309,257 @@
                 echo color('red').self::$oauth['issue'][0]['details']['text'];
             }
         }
+
+        public function orderlab_post(){
+            if(!isset(self::$oauth['issue'])){
+                $result = $this->md->orderlab(SERVER);
+                if(!empty($result)){
+                    foreach ($result as $a){
+                        $statusColor         = "";
+                        $statusMsg           = "";
+                        $patientid           = "";
+                        $mrpas               = "";
+                        $patientname         = "";
+                        $practitionerid      = "";
+                        $practitionername    = "";
+                        $practitionerradid   = "";
+                        $practitionerradname = "";
+                        $locationid          = "";
+                        $locationname        = "";
+                        $pasienid            = "";
+                        $episodeid           = "";
+                        $poliid              = "";
+                        $transco             = "";
+                        $layanid             = "";
+                        $dokterid            = "";
+                        $identifier          = "";
+                        $uuidservicerequest  = "";
+
+                        $body                                  = [];
+                        $servicerequest                        = [];
+                        $servicerequestresource                = [];
+                        $servicerequestresourceidentifier      = [];
+                        $servicerequestresourcecategory        = [];
+                        $servicerequestresourcecategorycoding  = [];
+                        $servicerequestresourcecode            = [];
+                        $servicerequestresourceperformer       = [];
+                        $servicerequestresourceperformer       = [];
+                        $servicerequestresourcereasonReference = [];
+                        $conditions                            = [];
+
+                        $uuidservicerequest = Satusehat::uuid();
+
+                        $pasienid   = $a->PASIEN_ID;
+                        $episodeid  = $a->EPISODE_ID;
+                        $poliid     = $a->POLI_ID;
+                        $transco    = $a->TRANS_CO;
+                        $layanid    = $a->TEST_ID;
+                        $dokterid   = $a->DOKTER_ID;
+                        $identifier = $a->TRANS_CO;
+
+                        if(SERVER === "production"){
+                            $patientid           = $a->PATIENTID;
+                            $mrpas               = $a->PATIENTMR;
+                            $patientname         = $a->PATIENTNAME;
+                            $practitionerid      = $a->PRACTITIONERID;
+                            $practitionername    = $a->PRACTITIONERNAME;
+                            $practitionerradid   = $a->PRACTITIONERRADID;
+                            $practitionerradname = $a->PRACTITIONERRADNAME;
+                            $locationid          = $a->LOCATIONID;
+                            $locationname        = $a->LOCATIONNAME;
+                        }else{
+                            $resultgetRandomPatient      = Satusehat::getRandomPatient();
+                            $resultgetRandomPractitioner = Satusehat::getRandomPractitioner();
+
+                            $patientid           = $resultgetRandomPatient['ihs'];
+                            $mrpas               = "123456";
+                            $patientname         = $resultgetRandomPatient['nama'];
+                            $practitionerid      = $resultgetRandomPractitioner['ihs'];
+                            $practitionername    = $resultgetRandomPractitioner['nama'];
+                            $practitionerradid   = $resultgetRandomPractitioner['ihs'];
+                            $practitionerradname = $resultgetRandomPractitioner['nama'];
+                            $locationid          = "91b6b664-929e-4b67-802a-a0a86a607a0c";
+                            $locationname        = $a->LOCATIONNAME;
+                        }
+
+                        $servicerequestresourcecategorycoding['system']  = "http://snomed.info/sct";
+                        $servicerequestresourcecategorycoding['code']    = "108252007";
+                        $servicerequestresourcecategorycoding['display'] = "Laboratory procedure";
+
+                        $servicerequestresourceidentifier['system']   = "http://sys-ids.kemkes.go.id/servicerequest/".RS_ID;
+                        $servicerequestresourceidentifier['use']      = "official";
+                        $servicerequestresourceidentifier['value']    = $identifier;
+                        $servicerequestresourcecategory['coding'][]   = $servicerequestresourcecategorycoding;
+                        $servicerequestresourcecode['system']         = "http://loinc.org";
+                        $servicerequestresourcecode['code']           = "55231-5";
+                        $servicerequestresourcecode['display']        = "Electrolytes panel - Blood";
+                        $servicerequestresourceperformer['reference'] = "Practitioner/".$practitionerid;
+                        $servicerequestresourceperformer['display']   = $practitionername;
+                        $conditions = explode(',', $a->CONDITIONID);
+                        foreach ($conditions as $conditionId) {
+                            $refcondition = [];
+                            $conditionId = trim($conditionId);
+                            $refcondition['reference'] = "Condition/".$conditionId;
+
+                            $specimentlabresourcereasonReference[] = $refcondition;
+                        }
+                        
+                        $servicerequestresource['resourceType']           = "ServiceRequest";
+                        $servicerequestresource['identifier'][]           = $servicerequestresourceidentifier;
+                        $servicerequestresource['status']                 = "active";
+                        $servicerequestresource['intent']                 = "original-order";
+                        $servicerequestresource['priority']               = "routine";
+                        $servicerequestresource['category'][]             = $servicerequestresourcecategory;
+                        $servicerequestresource['code']['coding'][]       = $servicerequestresourcecode;
+                        $servicerequestresource['code']['text']           = $a->NAMAPELAYANAN;
+                        $servicerequestresource['subject']['reference']   = "Patient/".$patientid;
+                        $servicerequestresource['subject']['display']     = $patientname;
+                        $servicerequestresource['encounter']['reference'] = "Encounter/".$a->RESOURCE_ID;
+                        $servicerequestresource['encounter']['display']   = "Permintaan Pemeriksaan".$a->NAMAPELAYANAN." ".$a->TGLORDER;
+                        $servicerequestresource['occurrenceDateTime']     = $a->TGLORDER;
+                        $servicerequestresource['authoredOn']             = $a->TGLORDER;
+                        $servicerequestresource['requester']['reference'] = "Practitioner/".$practitionerid;
+                        $servicerequestresource['requester']['display']   = $practitionername;
+                        $servicerequestresource['note'][]['text']         = (isset($a->CATATAN) && trim($a->CATATAN) !== '') ? $a->CATATAN : '-';
+                        $servicerequestresource['performer'][]            = $servicerequestresourceperformer;
+                        $servicerequestresource['reasonReference']        = $servicerequestresourcereasonReference;
+
+                        $servicerequest['fullUrl']           = "urn:uuid:".$uuidservicerequest;
+                        $servicerequest['request']['method'] = "POST";
+                        $servicerequest['request']['url']    = "ServiceRequest";
+                        $servicerequest['resource']          = $servicerequestresource;
+
+                        $body['resourceType'] = "Bundle";
+                        $body['type']         = "transaction";
+                        $body['entry'][]      = $servicerequest;
+
+                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+
+                        if(isset($response['entry'])){
+                            foreach($response['entry'] as $entrys){
+                                $simpanlog = [];
+
+                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                $simpanlog['POLI_ID']       = $poliid;
+                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                $simpanlog['TRANS_CO']      = $transco;
+                                $simpanlog['LAYAN_ID']      = $layanid;
+                                $simpanlog['IDENTIFIER']    = $identifier;
+                                $simpanlog['LOCATION']      = $entrys['response']['location'];
+                                $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
+                                $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
+                                $simpanlog['ETAG']          = $entrys['response']['etag'];
+                                $simpanlog['STATUS']        = $entrys['response']['status'];
+                                $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                $simpanlog['JENIS']         = "2";
+                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+    
+                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
+                               
+                                if(empty($resultcekdataresouce)){
+                                    $this->mss->insertdata($simpanlog);
+                                }
+                                
+
+                                $statusColor = "green";
+                                $statusMsg   = "Success";
+                                echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
+                            } 
+                        }else{
+                            if($response === null){
+                                $statusColor = "red";
+                                echo formatlogbundle($pasienid,$episodeid,'ServiceRequest','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
+                            }else{
+                                if(isset($response['fault'])){
+                                    $faultString = $response['fault']['faultstring'] ?? 'Unknown fault';
+                                    $errorCode   = $response['fault']['detail']['errorcode'] ?? 'unknown';
+                                    $statusColor = 'red';
+                                    $statusMsg   = 'FAULT | ' . $errorCode . ' | ' . $faultString;
+
+                                    echo formatlogbundle($pasienid,$episodeid,'ServiceRequest','',$statusMsg,$statusColor);
+                                }else{
+                                    if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
+                                        
+                                        foreach ($response['issue'] as $issues) {
+                                            if($issues['code']!="duplicate"){
+                                                $statusColor = "";
+                                                $severity    = $issues['severity'] ?? 'unknown';
+                                                $code        = $issues['code'] ?? '-';
+                                                $text        = $issues['details']['text'] ?? '-';
+                                                $diagnostics = $issues['diagnostics'] ?? $text;
+                                                $expression  = $issues['expression'][0] ?? '-';
+
+                                                switch ($severity) {
+                                                    case 'error':
+                                                        $statusColor = 'red';
+                                                        break;
+                                                    case 'warning':
+                                                        $statusColor = 'yellow';
+                                                        break;
+                                                    default:
+                                                        $statusColor = 'white';
+                                                }
+
+                                                $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
+                                                echo formatlogbundle($pasienid,$episodeid,'ServiceRequest','',$statusMsg,$statusColor);
+                                            }
+                                            
+                                        }
+                                    }
+
+                                    if(isset($response['issue'])){
+                                        if($response['issue'][0]['code']==="duplicate"){
+                                            $responsegetServiceRequest = [];
+                                            $responsegetServiceRequest = Satusehat::getdata("ServiceRequest","identifier",$identifier,self::$oauth['access_token']);
+
+                                            if(isset($responsegetServiceRequest['entry'])){
+                                                foreach($responsegetServiceRequest['entry'] as $responsegetServiceRequests){
+                                                    $simpanlog=[];
+
+                                                    $simpanlog['PASIEN_ID']     = $pasienid;
+                                                    $simpanlog['EPISODE_ID']    = $episodeid;
+                                                    $simpanlog['POLI_ID']       = $poliid;
+                                                    $simpanlog['DOKTER_ID']     = $dokterid;
+                                                    $simpanlog['TRANS_CO']      = $transco;
+                                                    $simpanlog['LAYAN_ID']      = $layanid;
+                                                    $simpanlog['IDENTIFIER']    = $identifier;
+                                                    $simpanlog['LOCATION']      = $responsegetServiceRequests['fullUrl']."/_history/".trim($responsegetServiceRequests['resource']['meta']['versionId'], 'W/"');
+                                                    $simpanlog['RESOURCE_TYPE'] = $responsegetServiceRequests['resource']['resourceType'];
+                                                    $simpanlog['RESOURCE_ID']   = $responsegetServiceRequests['resource']['id'];
+                                                    $simpanlog['ETAG']          = 'W/"' . $responsegetServiceRequests['resource']['meta']['versionId'] . '"';
+                                                    $simpanlog['STATUS']        = "201 Created";
+                                                    $simpanlog['LAST_MODIFIED'] = $responsegetServiceRequests['resource']['meta']['lastUpdated'];
+                                                    $simpanlog['ENVIRONMENT']   = SERVER;
+                                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                                                    $simpanlog['JENIS']         = "2";
+                                                    
+                                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id']);
+                                                    if(empty($resultcekdataresouce)){
+                                                        $this->mss->insertdata($simpanlog);
+                                                    }
+
+                                                    $statusColor = "yellow";
+                                                    $statusMsg   = "GET SERVICE REQUEST BY TRANS CO";
+                                                    echo formatlogbundle($pasienid,$episodeid,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id'], $statusMsg,$statusColor);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                
+                            }
+                        }
+                    }
+                }else{
+                    echo color('red')."Data Tidak Ditemukan";
+                }
+            }else{
+                echo color('red').self::$oauth['issue'][0]['details']['text'];
+            }
+        }
     }
 
 ?>

@@ -48,6 +48,48 @@
 			$recordset = $recordset->result();
 			return $recordset;
         }
+
+        function orderlab($env){
+            $query =
+                    "
+                        SELECT X.*,
+                               --Location
+                                (SELECT SATUSEHAT_ID  FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=X.POLI_ID)LOCATIONID,
+                                (SELECT NAME          FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=X.POLI_ID)LOCATIONNAME
+                        FROM(
+                            SELECT A.PASIEN_ID, EPISODE_ID, TEST_ID, CATATAN, TRANS_CO,
+                                    --Patient Index
+                                    SR01_GET_SUFFIX(A.PASIEN_ID)PATIENTNAME,
+                                    (SELECT INT_PASIEN_ID FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTMR,
+                                    (SELECT SATUSEHAT_ID  FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTID,
+
+                                    --Practitioner Index
+                                    (SELECT IHS_ID      FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND DOKTER_ID=A.CREATED_BY)PRACTITIONERID,
+                                    (SELECT UPPER(NAMA) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND DOKTER_ID=A.CREATED_BY)PRACTITIONERNAME,
+
+                                    (SELECT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)RESOURCE_ID,
+                                    (SELECT POLI_ID     FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)POLI_ID,
+                                    (SELECT DOKTER_ID   FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)DOKTER_ID,
+                                    (SELECT LISTAGG(RESOURCE_ID, ',')WITHIN GROUP (ORDER BY RESOURCE_ID) FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Condition' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)CONDITIONID,
+
+                                (SELECT NAMA_LAYAN1 FROM SR01_KEU_LAYAN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND LAYAN_ID=A.TEST_ID)NAMAPELAYANAN,
+                                TO_CHAR(A.CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' TGLORDER
+                            FROM WEB_CO_LAB_DT A
+                            WHERE A.SHOW_ITEM='1'
+                            AND   A.TEST_ID IN ('LPK122','XELEKT000000010')
+                            AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='ServiceRequest' AND JENIS='2' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID AND LAYAN_ID=A.TEST_ID)
+                            AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)
+                            ORDER BY CREATED_DATE DESC
+                            FETCH FIRST 1 ROWS ONLY
+                        )X
+                    ";
+
+			$recordset = $this->db->query($query);
+			$recordset = $recordset->result();
+			return $recordset;
+        }
+
+        
         
     }
 ?>

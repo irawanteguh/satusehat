@@ -127,7 +127,7 @@ async function runservices(){
 
 	isRunningServices = true;
 	try {
-		await callAPI("patientid", "POST");
+		await callAPI("orderlab", "POST");
 	} finally {
 		isRunningServices = false;
 	}
@@ -154,7 +154,9 @@ async function runservicesbundle(){
 
 
 console.clear();
+
 runservices();
-runservicesbundle();
 setInterval(runservices, 5000);
-setInterval(runservicesbundle, 20000);
+
+// runservicesbundle();
+// setInterval(runservicesbundle, 20000);
