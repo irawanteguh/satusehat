@@ -146,6 +146,7 @@ async function runservicesbundle(){
 		await callAPI("anamnesaawalrj", "POST");
 		await callAPI("orderrad", "POST");
 		await callAPI("orderlab", "POST");
+		await callAPI("specimenlab", "POST");
 		await callAPI("dicom", "POST");
 	} finally {
 		isRunningServicesBundle = false;

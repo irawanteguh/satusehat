@@ -33,7 +33,7 @@
     $orgid_dev  = "5767885d-7142-4d38-a2b8-70da28c277f4";
     $orgid_prod = "100026540";
 
-    $env = 'productionkemenkes';
+    $env = 'developmentkemenkes';
 
     switch ($env) {
 

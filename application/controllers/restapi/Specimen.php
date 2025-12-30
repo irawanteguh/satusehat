@@ -54,15 +54,76 @@
                     foreach ($result as $a){
                         $statusColor      = "";
                         $statusMsg        = "";
-
-                        $body                 = [];
-                        $specimentlab         = [];
-                        $specimentlabresource = [];
-
+                        $pasienid         = "";
+                        $episodeid        = "";
+                        $poliid           = "";
+                        $dokterid         = "";
+                        $layanid          = "";
+                        $sampelid         = "";
+                        $transco          = "";
                         $uuidspecimentlab = "";
+
+                        $body                                                   = [];
+                        $specimentlab                                           = [];
+                        $specimentlabresource                                   = [];
+                        $specimentlabresourceidentifier                         = [];
+                        $specimentlabresourcetype                               = [];
+                        $specimentlabresourcecollectionmethod                   = [];
+                        $specimentlabresourcecollectionmethodcoding             = [];
+                        $specimentlabresourcefastingStatusCodeableConcept       = [];
+                        $specimentlabresourcefastingStatusCodeableConceptcoding = [];
+                        $specimentlabresourcerequester                          = [];
+
+                        $pasienid         = $a->PASIEN_ID;
+                        $episodeid        = $a->EPISODE_ID;
+                        $poliid           = $a->POLI_ID;
+                        $dokterid         = $a->DOKTER_ID;
+                        $layanid          = $a->TEST_ID;
+                        $sampelid         = $a->SAMPELID;
+                        $transco          = $a->TRANS_CO;
                         $uuidspecimentlab = Satusehat::uuid();
 
-                        $specimentlabresource['collection']['collectedDateTime'] = $a->TGLORDER;
+                        if(SERVER === "production"){
+                            $patientid        = $a->PATIENTID;
+                            $mrpas            = $a->PATIENTMR;
+                            $patientname      = $a->PATIENTNAME;
+                        }else{
+                            $resultgetRandomPatient      = Satusehat::getRandomPatient();
+                            $resultgetRandomPractitioner = Satusehat::getRandomPractitioner();
+
+                            $patientid        = $resultgetRandomPatient['ihs'];
+                            $mrpas            = "123456";
+                            $patientname      = $resultgetRandomPatient['nama'];
+                        }
+
+                        $specimentlabresourcecollectionmethodcoding['system']              = "http://snomed.info/sct";
+                        $specimentlabresourcecollectionmethodcoding['code']                = "82078001";
+                        $specimentlabresourcecollectionmethodcoding['display']             = "Collection of blood specimen for laboratory (procedure)";
+                        $specimentlabresourcefastingStatusCodeableConceptcoding['system']  = "http://terminology.hl7.org/CodeSystem/v2-0916";
+                        $specimentlabresourcefastingStatusCodeableConceptcoding['code']    = "NF";
+                        $specimentlabresourcefastingStatusCodeableConceptcoding['display'] = "The patient indicated they did not fast prior to the procedure.";
+
+                        $specimentlabresourceidentifier['system']                     = "http://sys-ids.kemkes.go.id/specimen/".RS_ID;
+                        $specimentlabresourceidentifier['use']                        = "official";
+                        $specimentlabresourceidentifier['value']                      = $sampelid;
+                        $specimentlabresourceidentifier['assigner']['reference']      = "Organization/".RS_ID;
+                        $specimentlabresourcetype['system']                           = "http://snomed.info/sct";
+                        $specimentlabresourcetype['code']                             = "119297000";
+                        $specimentlabresourcetype['display']                          = "Blood specimen (specimen)";
+                        $specimentlabresourcecollectionmethod['coding'][]             = $specimentlabresourcecollectionmethodcoding;
+                        $specimentlabresourcefastingStatusCodeableConcept['coding'][] = $specimentlabresourcefastingStatusCodeableConceptcoding;
+
+                        $specimentlabresource['resourceType']                               = "Specimen";
+                        $specimentlabresource['identifier'][]                               = $specimentlabresourceidentifier;
+                        $specimentlabresource['status']                                     = "available";
+                        $specimentlabresource['type']['coding'][]                           = $specimentlabresourcetype;
+                        $specimentlabresource['collection']['method']                       = $specimentlabresourcecollectionmethod;
+                        $specimentlabresource['collection']['collectedDateTime']            = $a->TGLORDER;
+                        $specimentlabresource['collection']['fastingStatusCodeableConcept'] = $specimentlabresourcefastingStatusCodeableConcept;
+                        $specimentlabresource['subject']['reference']                       = "Patient/".$patientid;
+                        $specimentlabresource['subject']['display']                         = $patientname;
+                        $specimentlabresource['receivedTime']                               = $a->TGLORDER;
+                        $specimentlabresource['request'][]['reference']                     = "ServiceRequest/".$a->SERVICERQUEST_ID;
 
                         $specimentlab['fullUrl']           = "urn:uuid:".$uuidspecimentlab;
                         $specimentlab['request']['method'] = "POST";
@@ -73,129 +134,129 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $specimentlab;
 
-                        $this->response($specimentlabresource);
+                        // $this->response($specimentlabresource);
 
-                        // $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
-                        // if(isset($response['entry'])){
-                        //     foreach($response['entry'] as $entrys){
-                        //         $simpanlog = [];
+                        if(isset($response['entry'])){
+                            foreach($response['entry'] as $entrys){
+                                $simpanlog = [];
 
-                        //         $simpanlog['PASIEN_ID']     = $pasienid;
-                        //         $simpanlog['EPISODE_ID']    = $episodeid;
-                        //         $simpanlog['POLI_ID']       = $poliid;
-                        //         $simpanlog['DOKTER_ID']     = $dokterid;
-                        //         $simpanlog['TRANS_CO']      = $transco;
-                        //         $simpanlog['ACSN']          = $acsn;
-                        //         $simpanlog['LAYAN_ID']      = $layanid;
-                        //         $simpanlog['IDENTIFIER']    = $identifier;
-                        //         $simpanlog['LOCATION']      = $entrys['response']['location'];
-                        //         $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
-                        //         $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
-                        //         $simpanlog['ETAG']          = $entrys['response']['etag'];
-                        //         $simpanlog['STATUS']        = $entrys['response']['status'];
-                        //         $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
-                        //         $simpanlog['JENIS']         = "1";
-                        //         $simpanlog['ENVIRONMENT']   = SERVER;
-                        //         $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                $simpanlog['POLI_ID']       = $poliid;
+                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                $simpanlog['TRANS_CO']      = $transco;
+                                $simpanlog['LAYAN_ID']      = $layanid;
+                                $simpanlog['IDENTIFIER']    = $sampelid;
+                                $simpanlog['SAMPEL_ID']     = $sampelid;
+                                $simpanlog['LOCATION']      = $entrys['response']['location'];
+                                $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
+                                $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
+                                $simpanlog['ETAG']          = $entrys['response']['etag'];
+                                $simpanlog['STATUS']        = $entrys['response']['status'];
+                                $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                $simpanlog['JENIS']         = "1";
+                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
     
-                        //         $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
+                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
                                
-                        //         if(empty($resultcekdataresouce)){
-                        //             $this->mss->insertdata($simpanlog);
-                        //         }
+                                if(empty($resultcekdataresouce)){
+                                    $this->mss->insertdata($simpanlog);
+                                }
                                 
 
-                        //         $statusColor = "green";
-                        //         $statusMsg   = "Success";
-                        //         echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
-                        //     } 
-                        // }else{
-                        //     if($response === null){
-                        //         $statusColor = "red";
-                        //         echo formatlogbundle($pasienid,$episodeid,'Specimen','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
-                        //     }else{
-                        //         if(isset($response['fault'])){
-                        //             $faultString = $response['fault']['faultstring'] ?? 'Unknown fault';
-                        //             $errorCode   = $response['fault']['detail']['errorcode'] ?? 'unknown';
-                        //             $statusColor = 'red';
-                        //             $statusMsg   = 'FAULT | ' . $errorCode . ' | ' . $faultString;
+                                $statusColor = "green";
+                                $statusMsg   = "Success";
+                                echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
+                            } 
+                        }else{
+                            if($response === null){
+                                $statusColor = "red";
+                                echo formatlogbundle($pasienid,$episodeid,'Specimen','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
+                            }else{
+                                if(isset($response['fault'])){
+                                    $faultString = $response['fault']['faultstring'] ?? 'Unknown fault';
+                                    $errorCode   = $response['fault']['detail']['errorcode'] ?? 'unknown';
+                                    $statusColor = 'red';
+                                    $statusMsg   = 'FAULT | ' . $errorCode . ' | ' . $faultString;
 
-                        //             echo formatlogbundle($pasienid,$episodeid,'Specimen','',$statusMsg,$statusColor);
-                        //         }else{
-                        //             if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
+                                    echo formatlogbundle($pasienid,$episodeid,'Specimen','',$statusMsg,$statusColor);
+                                }else{
+                                    if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
                                         
-                        //                 foreach ($response['issue'] as $issues) {
-                        //                     if($issues['code']!="duplicate"){
-                        //                         $statusColor = "";
-                        //                         $severity    = $issues['severity'] ?? 'unknown';
-                        //                         $code        = $issues['code'] ?? '-';
-                        //                         $text        = $issues['details']['text'] ?? '-';
-                        //                         $diagnostics = $issues['diagnostics'] ?? $text;
-                        //                         $expression  = $issues['expression'][0] ?? '-';
+                                        foreach ($response['issue'] as $issues) {
+                                            if($issues['code']!="duplicate"){
+                                                $statusColor = "";
+                                                $severity    = $issues['severity'] ?? 'unknown';
+                                                $code        = $issues['code'] ?? '-';
+                                                $text        = $issues['details']['text'] ?? '-';
+                                                $diagnostics = $issues['diagnostics'] ?? $text;
+                                                $expression  = $issues['expression'][0] ?? '-';
 
-                        //                         switch ($severity) {
-                        //                             case 'error':
-                        //                                 $statusColor = 'red';
-                        //                                 break;
-                        //                             case 'warning':
-                        //                                 $statusColor = 'yellow';
-                        //                                 break;
-                        //                             default:
-                        //                                 $statusColor = 'white';
-                        //                         }
+                                                switch ($severity) {
+                                                    case 'error':
+                                                        $statusColor = 'red';
+                                                        break;
+                                                    case 'warning':
+                                                        $statusColor = 'yellow';
+                                                        break;
+                                                    default:
+                                                        $statusColor = 'white';
+                                                }
 
-                        //                         $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
-                        //                         echo formatlogbundle($pasienid,$episodeid,'Specimen','',$statusMsg,$statusColor);
-                        //                     }
+                                                $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
+                                                echo formatlogbundle($pasienid,$episodeid,'Specimen','',$statusMsg,$statusColor);
+                                            }
                                             
-                        //                 }
-                        //             }
+                                        }
+                                    }
 
-                        //             if(isset($response['issue'])){
-                        //                 if($response['issue'][0]['code']==="duplicate"){
-                        //                     $responsegetServiceRequest = [];
-                        //                     $responsegetServiceRequest = Satusehat::getdata("Specimen","identifier",$parameter,self::$oauth['access_token']);
+                                    if(isset($response['issue'])){
+                                        if($response['issue'][0]['code']==="duplicate"){
+                                            $responsegetServiceRequest = [];
+                                            $responsegetServiceRequest = Satusehat::getdata("Specimen","identifier",$sampelid,self::$oauth['access_token']);
 
-                        //                     if(isset($responsegetServiceRequest['entry'])){
-                        //                         foreach($responsegetServiceRequest['entry'] as $responsegetServiceRequests){
-                        //                             $simpanlog=[];
+                                            if(isset($responsegetServiceRequest['entry'])){
+                                                foreach($responsegetServiceRequest['entry'] as $responsegetServiceRequests){
+                                                    $simpanlog=[];
 
-                        //                             $simpanlog['PASIEN_ID']     = $pasienid;
-                        //                             $simpanlog['EPISODE_ID']    = $episodeid;
-                        //                             $simpanlog['POLI_ID']       = $poliid;
-                        //                             $simpanlog['DOKTER_ID']     = $dokterid;
-                        //                             $simpanlog['TRANS_CO']      = $transco;
-                        //                             $simpanlog['LAYAN_ID']      = $layanid;
-                        //                             $simpanlog['ACSN']          = $acsn;
-                        //                             $simpanlog['IDENTIFIER']    = $identifier;
-                        //                             $simpanlog['LOCATION']      = $responsegetServiceRequests['fullUrl']."/_history/".trim($responsegetServiceRequests['resource']['meta']['versionId'], 'W/"');
-                        //                             $simpanlog['RESOURCE_TYPE'] = $responsegetServiceRequests['resource']['resourceType'];
-                        //                             $simpanlog['RESOURCE_ID']   = $responsegetServiceRequests['resource']['id'];
-                        //                             $simpanlog['ETAG']          = 'W/"' . $responsegetServiceRequests['resource']['meta']['versionId'] . '"';
-                        //                             $simpanlog['STATUS']        = "201 Created";
-                        //                             $simpanlog['LAST_MODIFIED'] = $responsegetServiceRequests['resource']['meta']['lastUpdated'];
-                        //                             $simpanlog['ENVIRONMENT']   = SERVER;
-                        //                             $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                        //                             $simpanlog['JENIS']         = "1";
+                                                    $simpanlog['PASIEN_ID']     = $pasienid;
+                                                    $simpanlog['EPISODE_ID']    = $episodeid;
+                                                    $simpanlog['POLI_ID']       = $poliid;
+                                                    $simpanlog['DOKTER_ID']     = $dokterid;
+                                                    $simpanlog['TRANS_CO']      = $transco;
+                                                    $simpanlog['LAYAN_ID']      = $layanid;
+                                                    $simpanlog['IDENTIFIER']    = $sampelid;
+                                                    $simpanlog['SAMPEL_ID']     = $sampelid;
+                                                    $simpanlog['LOCATION']      = $responsegetServiceRequests['fullUrl']."/_history/".trim($responsegetServiceRequests['resource']['meta']['versionId'], 'W/"');
+                                                    $simpanlog['RESOURCE_TYPE'] = $responsegetServiceRequests['resource']['resourceType'];
+                                                    $simpanlog['RESOURCE_ID']   = $responsegetServiceRequests['resource']['id'];
+                                                    $simpanlog['ETAG']          = 'W/"' . $responsegetServiceRequests['resource']['meta']['versionId'] . '"';
+                                                    $simpanlog['STATUS']        = "201 Created";
+                                                    $simpanlog['LAST_MODIFIED'] = $responsegetServiceRequests['resource']['meta']['lastUpdated'];
+                                                    $simpanlog['ENVIRONMENT']   = SERVER;
+                                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                                                    $simpanlog['JENIS']         = "1";
                                                     
-                        //                             $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id']);
-                        //                             if(empty($resultcekdataresouce)){
-                        //                                 $this->mss->insertdata($simpanlog);
-                        //                             }
+                                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id']);
+                                                    if(empty($resultcekdataresouce)){
+                                                        $this->mss->insertdata($simpanlog);
+                                                    }
 
-                        //                             $statusColor = "yellow";
-                        //                             $statusMsg   = "GET SPECIMENT REQUEST BY SAMPEL ID";
-                        //                             echo formatlogbundle($pasienid,$episodeid,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id'], $statusMsg,$statusColor);
-                        //                         }
-                        //                     }
-                        //                 }
-                        //             }
-                        //         }
+                                                    $statusColor = "yellow";
+                                                    $statusMsg   = "GET SPECIMENT REQUEST BY SAMPEL ID";
+                                                    echo formatlogbundle($pasienid,$episodeid,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id'], $statusMsg,$statusColor);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
 
                                 
-                        //     }
-                        // }
+                            }
+                        }
                     }
                 }else{
                     echo color('red')."Data Tidak Ditemukan";
