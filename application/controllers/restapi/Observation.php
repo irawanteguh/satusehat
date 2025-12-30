@@ -110,8 +110,6 @@
                             $patientname         = $a->PATIENTNAME;
                             $practitionerid      = $a->PRACTITIONERID;
                             $practitionername    = $a->PRACTITIONERNAME;
-                            $practitionerradid   = $a->PRACTITIONERRADID;
-                            $practitionerradname = $a->PRACTITIONERRADNAME;
                             $locationid          = $a->LOCATIONID;
                             $locationname        = $a->LOCATIONNAME;
                         }else{
@@ -123,8 +121,6 @@
                             $patientname         = $resultgetRandomPatient['nama'];
                             $practitionerid      = $resultgetRandomPractitioner['ihs'];
                             $practitionername    = $resultgetRandomPractitioner['nama'];
-                            $practitionerradid   = $resultgetRandomPractitioner['ihs'];
-                            $practitionerradname = $resultgetRandomPractitioner['nama'];
                             $locationid          = "91b6b664-929e-4b67-802a-a0a86a607a0c";
                             $locationname        = $a->LOCATIONNAME;
                         }
