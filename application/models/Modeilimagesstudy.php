@@ -12,6 +12,7 @@
                         AND   A.RESOURCE_TYPE='ServiceRequest'
                         AND   A.JENIS='1'
                         AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='ImagingStudy' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID AND LAYAN_ID=A.LAYAN_ID)
+                        FETCH FIRST 1 ROWS ONLY
                     ";
 
 			$recordset = $this->db->query($query);
