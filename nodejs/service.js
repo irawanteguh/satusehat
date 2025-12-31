@@ -157,8 +157,8 @@ async function runservicesbundle(){
 
 console.clear();
 
-runservices();
-setInterval(runservices, 5000);
+// runservices();
+// setInterval(runservices, 5000);
 
 runservicesbundle();
 setInterval(runservicesbundle, 20000);

@@ -506,12 +506,6 @@
 
                         $uuidobservationhasillab = Satusehat::uuid();
 
-                        if($a->FLAG_HASIL==="H"){
-                            $observationlabresourceinterpretation['code']    = "H";
-                            $observationlabresourceinterpretation['display'] = "High";
-                            $observationlabresourceinterpretation['system']  = "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation";
-                        }
-
                         $observationlabresourcecategorycoding['system']  = "http://terminology.hl7.org/CodeSystem/observation-category";
                         $observationlabresourcecategorycoding['code']    = "laboratory";
                         $observationlabresourcecategorycoding['display'] = "Laboratory";
@@ -549,7 +543,6 @@
                         $observationlabresource['code']['coding'][]          = $observationlabresourcecode;
                         $observationlabresource['effectiveDateTime']         = $a->TGLHASIL;
                         $observationlabresource['encounter']                 = $observationlabresourceencounter;
-                        $a->FLAG_HASIL                                     !== null && $observationlabresource['interpretation'][]['coding'][] = $observationlabresourceinterpretation;
                         $observationlabresource['issued']                    = $a->TGLHASIL;
                         $observationlabresource['performer'][]               = $observationlabresourceperformer;
                         $observationlabresource['specimen']['reference']     = "Specimen/".$a->SPECIMENID;
@@ -569,6 +562,8 @@
                         $body['resourceType'] = "Bundle";
                         $body['type']         = "transaction";
                         $body['entry'][]      = $observationlab;
+
+                        $this->response($observationlabresource);
 
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
