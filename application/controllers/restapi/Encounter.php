@@ -35,7 +35,7 @@
 
         public function __construct(){
             parent::__construct();
-            $this->load->model("ModelEncounter", "md");
+            $this->load->model("Modelencounter", "md");
             $this->load->model("Modelsatusehat", "mss");
 
             $reqbody     = $this->input->raw_input_stream;

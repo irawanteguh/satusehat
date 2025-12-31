@@ -18,8 +18,8 @@ for (const iface of Object.values(interfaces)) {
 	}
 }
 
-// const BASE_URL = process.env.BASE_URL || `http://${host}/rsudpasarminggu/prod/satusehat/index.php/`;
-const BASE_URL = process.env.BASE_URL || `http://${host}/satusehat/index.php/`;
+const BASE_URL = process.env.BASE_URL || `http://${host}/rsudpasarminggu/prod/satusehat/index.php/`;
+// const BASE_URL = process.env.BASE_URL || `http://${host}/satusehat/index.php/`;
 
 function getTimeStamp() {
     const now = new Date();
@@ -144,6 +144,7 @@ async function runservicesbundle(){
 	try {
 		await callAPI("poliklinik", "POST");
 		await callAPI("anamnesaawalrj", "POST");
+		await callAPI("hasillab", "POST");
 		await callAPI("orderrad", "POST");
 		await callAPI("orderlab", "POST");
 		await callAPI("specimenlab", "POST");

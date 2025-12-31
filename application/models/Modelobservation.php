@@ -40,5 +40,41 @@
 			$recordset = $recordset->result();
 			return $recordset;
         }
+
+        function hasillab($env){
+            $query =
+                    "
+                        SELECT X.*,
+                            SR01_GET_SUFFIX(X.PASIEN_ID)PATIENTNAME,
+                            (SELECT INT_PASIEN_ID FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=X.PASIEN_ID)PATIENTMR,
+                            (SELECT SATUSEHAT_ID  FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=X.PASIEN_ID)PATIENTID,
+
+                            (SELECT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=X.PASIEN_ID AND EPISODE_ID=X.EPISODE_ID)RESOURCEID,
+                            (SELECT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='ServiceRequest' AND JENIS='2' AND ENVIRONMENT='".$env."' AND PASIEN_ID=X.PASIEN_ID AND EPISODE_ID=X.EPISODE_ID)SERVICERQUESTID,
+                            (SELECT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Specimen' AND ENVIRONMENT='".$env."' AND PASIEN_ID=X.PASIEN_ID AND EPISODE_ID=X.EPISODE_ID)SPECIMENID,
+                            (SELECT POLI_ID     FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=X.PASIEN_ID AND EPISODE_ID=X.EPISODE_ID)POLI_ID,
+                            (SELECT DOKTER_ID   FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=X.PASIEN_ID AND EPISODE_ID=X.EPISODE_ID)DOKTER_ID
+
+                        FROM(
+                            SELECT A.TES_ID, HASIL_NILAI, SAMPEL_ID, FLAG_HASIL,
+                                (SELECT PASIEN_ID  FROM SR01_WORKLIST_LAB WHERE SAMPEL_ID=A.SAMPEL_ID)PASIEN_ID,
+                                (SELECT EPISODE_ID FROM SR01_WORKLIST_LAB WHERE SAMPEL_ID=A.SAMPEL_ID)EPISODE_ID,
+
+                                TO_CHAR(A.LAST_UPDATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(LAST_UPDATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' TGLHASIL
+                                                        
+                            FROM LP4_SAMPEL_TES A
+                            WHERE A.STATUS_HASIL='05'
+                            AND   A.TES_ID   IN ('CL','K','NA')
+                            AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Specimen' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.SAMPEL_ID=A.SAMPEL_ID)
+                            AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Observation' AND T.JENIS='2' AND T.ENVIRONMENT='".$env."' AND T.SAMPEL_ID=A.SAMPEL_ID AND T.LAYAN_ID=A.TES_ID)
+                            ORDER BY CREATED_DATE ASC
+                            FETCH FIRST 3 ROWS ONLY
+                        )X
+                    ";
+
+			$recordset = $this->db->query($query);
+			$recordset = $recordset->result();
+			return $recordset;
+        }
     }
 ?>

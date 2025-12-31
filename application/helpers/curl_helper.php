@@ -35,9 +35,39 @@
 
         curl_close($curl);
 
-        // if($config['url'] != OAUTH_URL ){
-        //     return var_dump($response);
-        // }
+        $responseerror = json_decode($response, true);
+        $configBody    = json_decode($config['body'], true);
+        $episodeid     = null; 
+
+        if(isset($configBody['entry'][0]['resource']['identifier'])){
+            if(is_array($configBody['entry'][0]['resource']['identifier']) && isset($configBody['entry'][0]['resource']['identifier'][0])){ 
+                $episodeid = isset($configBody['entry'][0]['resource']['identifier'][0]['value']) ? $configBody['entry'][0]['resource']['identifier'][0]['value'] : null;
+            }else{
+                $episodeid = isset($configBody['entry'][0]['resource']['identifier']['value']) ? $configBody['entry'][0]['resource']['identifier']['value'] : null;
+            }
+        }
+
+        if(isset($responseerror['issue'])){
+            $resourcetype  = isset($responseerror['resourceType']) ? $responseerror['resourceType'] : null;
+            $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
+
+            foreach ($responseerror['issue'] as $a) {
+                $issuelog = [
+                    'REQUEST_ID'    => round(microtime(true) * 1000),
+                    'RESOURCE_TYPE' => $resourcetype,
+                    'STATUS'        => $status,
+                    'SEVERITY'      => isset($a['severity']) ? $a['severity'] : null,
+                    'CODE'          => isset($a['code']) ? $a['code'] : null,
+                    'DETAILS'       => isset($a['details']['text']) ? $a['details']['text'] : null,
+                    'EXPRESSION'    => isset($a['expression'][0]) ? $a['expression'][0] : null,
+                    'DIAGNOSTIC'    => isset($a['diagnostics']) ? $a['diagnostics'] : null,
+                    'SOURCE'        => isset($config['source']) ? $config['source'] : null,
+                    'TRANS_ID'      => $episodeid
+                ];
+
+                $ci->mlog->saveissuelog($issuelog);
+            }
+        }
         
         return json_decode($response,true);
     }
