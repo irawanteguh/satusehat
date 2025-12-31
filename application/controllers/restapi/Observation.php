@@ -563,7 +563,7 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $observationlab;
 
-                        $this->response($observationlabresource);
+                        // $this->response($observationlabresource);
 
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
