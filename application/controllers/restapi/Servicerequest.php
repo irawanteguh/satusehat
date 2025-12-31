@@ -179,6 +179,8 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $servicerequest;
 
+                        // $this->response($servicerequestresource);
+
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
                         if(isset($response['entry'])){
