@@ -142,13 +142,13 @@ async function runservicesbundle(){
 
 	isRunningServicesBundle = true;
 	try {
-		// await callAPI("poliklinik", "POST");
-		// await callAPI("anamnesaawalrj", "POST");
-		// await callAPI("hasillab", "POST");
+		await callAPI("poliklinik", "POST");
+		await callAPI("anamnesaawalrj", "POST");
+		await callAPI("hasillab", "POST");
 		await callAPI("orderrad", "POST");
-		// await callAPI("orderlab", "POST");
-		// await callAPI("specimenlab", "POST");
-		// await callAPI("dicom", "POST");
+		await callAPI("orderlab", "POST");
+		await callAPI("specimenlab", "POST");
+		await callAPI("dicom", "POST");
 	} finally {
 		isRunningServicesBundle = false;
 	}
@@ -157,8 +157,8 @@ async function runservicesbundle(){
 
 console.clear();
 
-// runservices();
-// setInterval(runservices, 5000);
+runservices();
+setInterval(runservices, 5000);
 
 runservicesbundle();
 setInterval(runservicesbundle, 20000);
