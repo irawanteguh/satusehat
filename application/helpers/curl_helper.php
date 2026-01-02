@@ -67,7 +67,7 @@
                         'DETAILS'       => isset($a['details']['text']) ? $a['details']['text'] : null,
                         'EXPRESSION'    => isset($a['expression'][0]) ? $a['expression'][0] : null,
                         'DIAGNOSTIC'    => isset($a['diagnostics']) ? $a['diagnostics'] : null,
-                        'SOURCE'        => isset($config['source']) ? $config['source'] : null,
+                        'SOURCE'        => "MIDDLEWARE",
                         'TRANS_ID'      => $episodeid
                     ];
                     $ci->mlog->saveissuelog($issuelog);
