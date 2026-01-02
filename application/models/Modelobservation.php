@@ -67,7 +67,7 @@
                             AND   A.TES_ID   IN ('CL','K','NA')
                             AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Specimen' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.SAMPEL_ID=A.SAMPEL_ID)
                             AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Observation' AND T.JENIS='2' AND T.ENVIRONMENT='".$env."' AND T.SAMPEL_ID=A.SAMPEL_ID AND T.LAYAN_ID=A.TES_ID)
-                            ORDER BY CREATED_DATE ASC
+                            ORDER BY CREATED_DATE DESC, SAMPEL_ID ASC
                             FETCH FIRST 3 ROWS ONLY
                         )X
                     ";
