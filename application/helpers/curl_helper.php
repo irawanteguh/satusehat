@@ -52,20 +52,22 @@
             $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
 
             foreach ($responseerror['issue'] as $a) {
-                $issuelog = [
-                    'REQUEST_ID'    => round(microtime(true) * 1000),
-                    'RESOURCE_TYPE' => $resourcetype,
-                    'STATUS'        => $status,
-                    'SEVERITY'      => isset($a['severity']) ? $a['severity'] : null,
-                    'CODE'          => isset($a['code']) ? $a['code'] : null,
-                    'DETAILS'       => isset($a['details']['text']) ? $a['details']['text'] : null,
-                    'EXPRESSION'    => isset($a['expression'][0]) ? $a['expression'][0] : null,
-                    'DIAGNOSTIC'    => isset($a['diagnostics']) ? $a['diagnostics'] : null,
-                    'SOURCE'        => isset($config['source']) ? $config['source'] : null,
-                    'TRANS_ID'      => $episodeid
-                ];
-
-                $ci->mlog->saveissuelog($issuelog);
+                if($a['code']!="duplicate"){
+                    $issuelog = [
+                        'REQUEST_ID'    => round(microtime(true) * 1000),
+                        'RESOURCE_TYPE' => $resourcetype,
+                        'STATUS'        => $status,
+                        'SEVERITY'      => isset($a['severity']) ? $a['severity'] : null,
+                        'CODE'          => isset($a['code']) ? $a['code'] : null,
+                        'DETAILS'       => isset($a['details']['text']) ? $a['details']['text'] : null,
+                        'EXPRESSION'    => isset($a['expression'][0]) ? $a['expression'][0] : null,
+                        'DIAGNOSTIC'    => isset($a['diagnostics']) ? $a['diagnostics'] : null,
+                        'SOURCE'        => isset($config['source']) ? $config['source'] : null,
+                        'TRANS_ID'      => $episodeid
+                    ];
+                    $ci->mlog->saveissuelog($issuelog);
+                }
+                
             }
         }
         
