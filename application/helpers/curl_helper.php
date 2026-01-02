@@ -37,7 +37,8 @@
 
         $responseerror = json_decode($response, true);
         $configBody    = json_decode($config['body'], true);
-        $episodeid     = null; 
+        $episodeid     = null;
+        $resourcetype  = null;
 
         if(isset($configBody['entry'][0]['resource']['identifier'])){
             if(is_array($configBody['entry'][0]['resource']['identifier']) && isset($configBody['entry'][0]['resource']['identifier'][0])){ 
@@ -45,10 +46,14 @@
             }else{
                 $episodeid = isset($configBody['entry'][0]['resource']['identifier']['value']) ? $configBody['entry'][0]['resource']['identifier']['value'] : null;
             }
+
+            if(is_array($configBody['entry'][0]['resource']['resourceType'])){ 
+                $resourcetype = isset($configBody['entry'][0]['resource']['resourceType']) ? $configBody['entry'][0]['resource']['resourceType'] : null;
+            }
         }
 
         if(isset($responseerror['issue'])){
-            $resourcetype  = isset($responseerror['resourceType']) ? $responseerror['resourceType'] : null;
+            // $resourcetype  = isset($responseerror['resourceType']) ? $responseerror['resourceType'] : null;
             $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
 
             foreach ($responseerror['issue'] as $a) {
