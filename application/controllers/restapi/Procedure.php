@@ -125,8 +125,8 @@
                         $procedureresource['code']['coding'][]         = $procedureresourcecode;
                         $procedureresource['encounter']['reference']   = "Encounter/".$a->RESOURCE_ID;
                         $procedureresource['note'][]['text']           = (isset($a->CATATAN) && trim($a->CATATAN) !== '') ? $a->CATATAN : '-';
-                        $procedureresource['performedPeriod']['end']   = $a->TGLORDER;
-                        $procedureresource['performedPeriod']['start'] = $a->TGLORDER;
+                        // $procedureresource['performedPeriod']['end']   = $a->TGLORDER;
+                        // $procedureresource['performedPeriod']['start'] = $a->TGLORDER;
                         $procedureresource['performer'][]              = $procedureresourceperformer;
                         $procedureresource['resourceType']             = "Procedure";
                         $procedureresource['status']                   = "completed";
