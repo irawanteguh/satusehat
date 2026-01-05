@@ -163,5 +163,5 @@ console.clear();
 runservices();
 setInterval(runservices, 5000);
 
-// runservicesbundle();
-// setInterval(runservicesbundle, 20000);
+runservicesbundle();
+setInterval(runservicesbundle, 20000);
