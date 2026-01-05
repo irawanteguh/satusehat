@@ -34,4 +34,5 @@
     $route['allergyintolerance'] = 'restapi/Allergyintolerance/allergyintolerance';
     $route['radiologi']          = 'restapi/Procedure/radiologi';
     $route['cipoliklinik']       = 'restapi/Clinicalimpression/cipoliklinik';
+    $route['qpoliklinik']       = 'restapi/Questionnaireresponse/qpoliklinik';
 ?>
