@@ -151,6 +151,7 @@ async function runservicesbundle(){
 		await callAPI("dicom", "POST");
 		await callAPI("diaglaboratorium", "POST");
 		await callAPI("careplan", "POST");
+		await callAPI("allergyintolerance", "POST");
 	} finally {
 		isRunningServicesBundle = false;
 	}
@@ -162,5 +163,5 @@ console.clear();
 runservices();
 setInterval(runservices, 5000);
 
-runservicesbundle();
-setInterval(runservicesbundle, 20000);
+// runservicesbundle();
+// setInterval(runservicesbundle, 20000);
