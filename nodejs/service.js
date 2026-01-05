@@ -128,6 +128,7 @@ async function runservices(){
 	isRunningServices = true;
 	try {
 		await callAPI("patientid", "POST");
+		// await callAPI("radiologi", "POST");
 	} finally {
 		isRunningServices = false;
 	}
@@ -152,6 +153,7 @@ async function runservicesbundle(){
 		await callAPI("diaglaboratorium", "POST");
 		await callAPI("careplan", "POST");
 		await callAPI("allergyintolerance", "POST");
+		await callAPI("radiologi", "POST");
 	} finally {
 		isRunningServicesBundle = false;
 	}
@@ -163,5 +165,5 @@ console.clear();
 runservices();
 setInterval(runservices, 5000);
 
-runservicesbundle();
-setInterval(runservicesbundle, 20000);
+// runservicesbundle();
+// setInterval(runservicesbundle, 20000);
