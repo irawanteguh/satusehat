@@ -222,7 +222,11 @@
                         }
                         if($a->INPROGRESSSTART!=null && $a->INPROGRESSEND!=null){
                             $statusHistoryinprogress['period']['start'] = $a->INPROGRESSSTART;
-                            $statusHistoryinprogress['period']['end']   = $a->INPROGRESSEND;
+                            if (strtotime($a->INPROGRESSEND) < strtotime($a->INPROGRESSSTART)) {
+                                $statusHistoryinprogress['period']['end'] = $a->INPROGRESSSTART;
+                            } else {
+                                $statusHistoryinprogress['period']['end'] = $a->INPROGRESSEND;
+                            }
                             $statusHistoryinprogress['status']          = "in-progress";
                             $resource['statusHistory'][]                = $statusHistoryinprogress;
                         }
@@ -244,6 +248,8 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $encounter;
                         $body['entry']        = array_merge($body['entry'], $conditiondiag);
+
+                        // $this->response($body);
 
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
