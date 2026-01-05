@@ -78,7 +78,7 @@ async function callAPI(endpoint, method = "GET", body = null) {
 				method,
 				endpoint,
 				response.status,
-				response.statusText,
+				response.statusText+" : "+url,
 				"red"
 			);
 			return;
@@ -128,7 +128,7 @@ async function runservices(){
 	isRunningServices = true;
 	try {
 		await callAPI("patientid", "POST");
-		// await callAPI("radiologi", "POST");
+		// await callAPI("cipoliklinik", "POST");
 	} finally {
 		isRunningServices = false;
 	}
@@ -154,6 +154,7 @@ async function runservicesbundle(){
 		await callAPI("careplan", "POST");
 		await callAPI("allergyintolerance", "POST");
 		await callAPI("radiologi", "POST");
+		await callAPI("cipoliklinik", "POST");
 	} finally {
 		isRunningServicesBundle = false;
 	}
@@ -165,5 +166,5 @@ console.clear();
 runservices();
 setInterval(runservices, 5000);
 
-runservicesbundle();
-setInterval(runservicesbundle, 20000);
+// runservicesbundle();
+// setInterval(runservicesbundle, 20000);
