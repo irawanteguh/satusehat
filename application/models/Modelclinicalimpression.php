@@ -25,7 +25,7 @@
                         AND   A.JENIS='1'
                         AND   A.ENVIRONMENT='".$env."'
                         AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='ClinicalImpression' AND JENIS='1' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)
-                        FETCH FIRST 1 ROWS ONLY
+                        FETCH FIRST 50 ROWS ONLY
                     ";
 
 			$recordset = $this->db->query($query);
