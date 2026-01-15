@@ -128,7 +128,7 @@ async function runservices(){
 	isRunningServices = true;
 	try {
 		await callAPI("patientid", "POST");
-		// await callAPI("qpoliklinik", "POST");
+		// await callAPI("compoliklinik", "POST");
 	} finally {
 		isRunningServices = false;
 	}
@@ -156,6 +156,7 @@ async function runservicesbundle(){
 		await callAPI("radiologi", "POST");
 		await callAPI("cipoliklinik", "POST");
 		await callAPI("qpoliklinik", "POST");
+		await callAPI("compoliklinik", "POST");
 	} finally {
 		isRunningServicesBundle = false;
 	}

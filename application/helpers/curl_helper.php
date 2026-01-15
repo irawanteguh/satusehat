@@ -53,7 +53,6 @@
         }
 
         if(isset($responseerror['issue'])){
-            // $resourcetype  = isset($responseerror['resourceType']) ? $responseerror['resourceType'] : null;
             $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
 
             foreach ($responseerror['issue'] as $a) {
