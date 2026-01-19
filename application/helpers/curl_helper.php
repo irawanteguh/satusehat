@@ -44,7 +44,7 @@
             if(is_array($configBody['entry'][0]['resource']['identifier']) && isset($configBody['entry'][0]['resource']['identifier'][0])){ 
                 $episodeid = isset($configBody['entry'][0]['resource']['identifier'][0]['value']) ? $configBody['entry'][0]['resource']['identifier'][0]['value'] : null;
             }else{
-                $episodeid = isset($configBody['entry'][0]['resource']['identifier']['value']) ? $configBody['entry'][0]['resource']['identifier']['value'] : null;
+                $episodeid = isset($configBody['entry'][0]['resource']['identifier'][0]['value']) ? $configBody['entry'][0]['resource']['identifier'][0]['value'] : null;
             }
 
             if(is_array($configBody['entry'][0]['resource']['resourceType'])){ 
