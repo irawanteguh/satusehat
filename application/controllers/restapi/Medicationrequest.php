@@ -30,12 +30,12 @@
         }
     }
 
-    class Medication extends REST_Controller{
+    class Medicationrequest extends REST_Controller{
         public static $oauth;
 
         public function __construct(){
             parent::__construct();
-            $this->load->model("Modelmedication", "md");
+            $this->load->model("Modelmedicationrequest", "md");
             $this->load->model("Modelsatusehat", "mss");
 
             $reqbody     = $this->input->raw_input_stream;
@@ -61,14 +61,17 @@
                         $transco     = "";
                         $identifier  = "";
 
-                        $body                                           = [];
-                        $medication                                     = [];
-                        $medicationresource                             = [];
-                        $medicationresourcecode                         = [];
-                        $medicationresourcextension                     = [];
-                        $medicationresourcextensionvalueCodeableConcept = [];
-                        $medicationresourceidentifier                   = [];
-
+                        $body                                         = [];
+                        $medicationrequest                            = [];
+                        $medicationrequestresource                    = [];
+                        $medicationrequestresourcecategory            = [];
+                        $medicationrequestresourcecategorycoding      = [];
+                        $medicationrequestresourcedosageInstruction   = [];
+                        $medicationrequestresourceidentifier1         = [];
+                        $medicationrequestresourceidentifier2         = [];
+                        $medicationrequestresourcemedicationReference = [];
+                        $medicationrequestresourcerequester           = [];
+                        $medicationrequestresourcesubject             = [];
 
                         $pasienid   = $a->PASIEN_ID;
                         $episodeid  = $a->EPISODE_ID;
@@ -78,32 +81,71 @@
                         $transco    = $a->TRANS_CO;
                         $identifier = $a->EPISODE_ID."-".$a->TRANS_CO."-".$a->OBAT_ID;
 
-                        $medicationresourcextensionvalueCodeableConcept['code']    = "NC";
-                        $medicationresourcextensionvalueCodeableConcept['display'] = "Non-compound";
-                        $medicationresourcextensionvalueCodeableConcept['system']  = "http://terminology.kemkes.go.id/CodeSystem/medication-type";
+                        if(SERVER === "production"){
+                            $patientid           = $a->PATIENTID;
+                            $mrpas               = $a->PATIENTMR;
+                            $patientname         = $a->PATIENTNAME;
+                            $practitionerid      = $a->PRACTITIONERID;
+                            $practitionername    = $a->PRACTITIONERNAME;
+                        }else{
+                            $resultgetRandomPatient      = Satusehat::getRandomPatient();
+                            $resultgetRandomPractitioner = Satusehat::getRandomPractitioner();
 
-                        $medicationresourcecode['code']                                 = $a->KFAID;
-                        $medicationresourcecode['display']                              = $a->POANAME;
-                        $medicationresourcecode['system']                               = "http://sys-ids.kemkes.go.id/kfa";
-                        $medicationresourcextension['url']                              = "https://fhir.kemkes.go.id/r4/StructureDefinition/MedicationType";
-                        $medicationresourcextension['valueCodeableConcept']['coding'][] = $medicationresourcextensionvalueCodeableConcept;
-                        $medicationresourceidentifier['system']                        = "http://sys-ids.kemkes.go.id/medication/".RS_ID;
-                        $medicationresourceidentifier['use']                           = "official";
-                        $medicationresourceidentifier['value']                         = $identifier;
+                            $patientid           = $resultgetRandomPatient['ihs'];
+                            $mrpas               = "123456";
+                            $patientname         = $resultgetRandomPatient['nama'];
+                            $practitionerid      = $resultgetRandomPractitioner['ihs'];
+                            $practitionername    = $resultgetRandomPractitioner['nama'];
+                        }
+
+                        $medicationrequestresourcecategorycoding['code']    = "outpatient";
+                        $medicationrequestresourcecategorycoding['display'] = "Outpatient";
+                        $medicationrequestresourcecategorycoding['system']  = "http://terminology.hl7.org/CodeSystem/medicationrequest-category";
+
+                        $medicationrequestresourcecategory['coding'][]                                 = $medicationrequestresourcecategorycoding;
+                        $medicationrequestresourcedosageInstruction['additionalInstruction'][]['text'] = ($a->CATATAN ? $a->CATATAN : '-');
+                        $medicationrequestresourcedosageInstruction['patientInstruction']              = ($a->CATATAN ? $a->CATATAN : '-');
+                        $medicationrequestresourcedosageInstruction['text']                            = ($a->CATATAN ? $a->CATATAN : '-');
+                        $medicationrequestresourceidentifier1['system']                                = "http://sys-ids.kemkes.go.id/prescription/".RS_ID;
+                        $medicationrequestresourceidentifier1['use']                                   = "official";
+                        $medicationrequestresourceidentifier1['value']                                 = $episodeid;
+                        $medicationrequestresourceidentifier2['system']                                = "http://sys-ids.kemkes.go.id/prescription-item/".RS_ID;
+                        $medicationrequestresourceidentifier2['use']                                   = "official";
+                        $medicationrequestresourceidentifier2['value']                                 = $identifier;
+                        $medicationrequestresourceidentifier3['system']                                = "http://sys-ids.kemkes.go.id/prescription-item/".RS_ID;
+                        $medicationrequestresourcemedicationReference['display']                       = $a->POANAME;
+                        $medicationrequestresourcemedicationReference['reference']                     = "Medication/".$a->MEDICATIONID;
+                        $medicationrequestresourcerequester['display']                                 = $practitionername;
+                        $medicationrequestresourcerequester['reference']                               = "Practitioner/".$practitionerid;
+                        $medicationrequestresourcesubject['display']                                   = $patientname;
+                        $medicationrequestresourcesubject['reference']                                 = "Patient/".$patientid;
+
+                        $medicationrequestresource['authoredOn']                                = $a->CREATEDDATE;
+                        $medicationrequestresource['category'][]                                = $medicationrequestresourcecategory;
+                        $medicationrequestresource['dispenseRequest']['performer']['reference'] = "Organization/".RS_ID;
+                        $medicationrequestresource['dosageInstruction'][]                       = $medicationrequestresourcedosageInstruction;
+                        $medicationrequestresource['encounter']['reference']                    = "Encounter/".$a->RESOURCEID;
+                        $medicationrequestresource['identifier'][]                              = $medicationrequestresourceidentifier1;
+                        $medicationrequestresource['identifier'][]                              = $medicationrequestresourceidentifier2;
+                        $medicationrequestresource['intent']                                    = "order";
+                        $medicationrequestresource['medicationReference']                       = $medicationrequestresourcemedicationReference;
+                        $medicationrequestresource['priority']                                  = "routine";
+                        $medicationrequestresource['requester']                                 = $medicationrequestresourcerequester;
+                        $medicationrequestresource['resourceType']                              = "MedicationRequest";
+                        $medicationrequestresource['status']                                    = "completed";
+                        $medicationrequestresource['subject']                                   = $medicationrequestresourcesubject;
                         
-                        $medicationresource['code']['coding'][] = $medicationresourcecode;
-                        $medicationresource['extension'][]      = $medicationresourcextension;
-                        $medicationresource['identifier'][]     = $medicationresourceidentifier;
-                        $medicationresource['resourceType']     = "Medication";
-                        
-                        $medication['fullUrl']           = "urn:uuid:".Satusehat::uuid();
-                        $medication['request']['method'] = "POST";
-                        $medication['request']['url']    = "Medication";
-                        $medication['resource']          = $medicationresource;
+                                                
+                        $medicationrequest['fullUrl']           = "urn:uuid:".Satusehat::uuid();
+                        $medicationrequest['request']['method'] = "POST";
+                        $medicationrequest['request']['url']    = "MedicationRequest";
+                        $medicationrequest['resource']          = $medicationrequestresource;
 
                         $body['resourceType'] = "Bundle";
                         $body['type']         = "transaction";
-                        $body['entry'][]      = $medication;
+                        $body['entry'][]      = $medicationrequest;
+
+                        // $this->response($medicationrequestresource);
                         
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
@@ -142,7 +184,7 @@
                         }else{
                             if($response === null){
                                 $statusColor = "red";
-                                echo formatlogbundle($pasienid,$episodeid,'Medication','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
+                                echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
                             }else{
                                 if(isset($response['fault'])){
                                     $faultString = $response['fault']['faultstring'] ?? 'Unknown fault';
@@ -150,7 +192,7 @@
                                     $statusColor = 'red';
                                     $statusMsg   = 'FAULT | ' . $errorCode . ' | ' . $faultString;
 
-                                    echo formatlogbundle($pasienid,$episodeid,'Medication','',$statusMsg,$statusColor);
+                                    echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','',$statusMsg,$statusColor);
                                 }else{
                                     if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
                                         
@@ -175,7 +217,7 @@
                                                 }
 
                                                 $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
-                                                echo formatlogbundle($pasienid,$episodeid,'Medication','',$statusMsg,$statusColor);
+                                                echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','',$statusMsg,$statusColor);
                                             }
                                             
                                         }
@@ -184,7 +226,7 @@
                                     if(isset($response['issue'])){
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetServiceRequest = [];
-                                            $responsegetServiceRequest = Satusehat::getdata("Medication","identifier",$identifier,self::$oauth['access_token']);
+                                            $responsegetServiceRequest = Satusehat::getdata("MedicationRequest","identifier",$identifier,self::$oauth['access_token']);
 
                                             if(isset($responsegetServiceRequest['entry'])){
                                                 foreach($responsegetServiceRequest['entry'] as $responsegetServiceRequests){
@@ -213,13 +255,13 @@
                                                     }
 
                                                     $statusColor = "yellow";
-                                                    $statusMsg   = "GET Medication BY Identifier";
+                                                    $statusMsg   = "GET MedicationRequest BY Identifier";
                                                     echo formatlogbundle($pasienid,$episodeid,$responsegetServiceRequests['resource']['resourceType'],$responsegetServiceRequests['resource']['id'], $statusMsg,$statusColor);
                                                 }
                                             }else{
                                                 $statusColor = "yellow";
-                                                $statusMsg   = "GET Medication BY Identifier Tidak Di Temukan";
-                                                echo formatlogbundle($pasienid,$episodeid,"Medication","", $statusMsg,$statusColor);
+                                                $statusMsg   = "GET MedicationRequest BY Identifier Tidak Di Temukan";
+                                                echo formatlogbundle($pasienid,$episodeid,"MedicationRequest","", $statusMsg,$statusColor);
                                             }
                                         }
                                     }

@@ -158,6 +158,7 @@ async function runservicesbundle(){
 		await callAPI("qpoliklinik", "POST");
 		await callAPI("compoliklinik", "POST");
 		await callAPI("singledose", "POST");
+		await callAPI("singledosereq", "POST");
 	} finally {
 		isRunningServicesBundle = false;
 	}

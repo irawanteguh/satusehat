@@ -37,4 +37,5 @@
     $route['qpoliklinik']        = 'restapi/Questionnaireresponse/qpoliklinik';
     $route['compoliklinik']      = 'restapi/Composition/compoliklinik';
     $route['singledose']         = 'restapi/Medication/singledose';
+    $route['singledosereq']      = 'restapi/Medicationrequest/singledose';
 ?>
