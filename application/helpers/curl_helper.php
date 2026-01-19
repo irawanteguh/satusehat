@@ -56,7 +56,7 @@
             $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
 
             foreach ($responseerror['issue'] as $a) {
-                if($a['code']!="duplicate" || $a['code']!="Invalid access token" || $a['code']!="throttled"){
+                if($a['code']!="duplicate" && $a['code']!="Invalid access token" && $a['code']!="throttled"){
                     $issuelog = [
                         'REQUEST_ID'    => round(microtime(true) * 1000),
                         'RESOURCE_TYPE' => $resourcetype,
