@@ -16,6 +16,7 @@
                             FROM WEB_CO_RESEP_DT A
                             WHERE A.SHOW_ITEM='1'
                             AND   A.TYPE='00'
+                            AND   A.CREATED_BY LIKE 'DR%'
                             AND   A.EPISODE_ID NOT IN ('B125102873325','B125102874460','B125102876151')
                             AND   A.OBAT_ID NOT IN ('VAKSI0000000012','VAKSI0000000013')
                             AND   EXISTS (SELECT 1 FROM SR01_FRM_OBAT_MS WHERE OBAT_ID=A.OBAT_ID AND KFA_ID IS NOT NULL)
