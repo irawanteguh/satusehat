@@ -24,7 +24,7 @@
                             P.INT_PASIEN_ID AS PATIENTMR,
                             P.SATUSEHAT_ID  AS PATIENTID,
 
-                            -- Practitioner
+                            -- Practitioner (WAJIB ADA)
                             U.IHS_ID        AS PRACTITIONERID,
                             UPPER(U.NAMA)   AS PRACTITIONERNAME
 
@@ -41,9 +41,11 @@
                             AND P.LOKASI_ID = '001'
                             AND P.AKTIF = '1'
 
-                        LEFT JOIN SR01_GEN_USER_DATA U
+                        -- 🔴 UBAH KE INNER JOIN
+                        JOIN SR01_GEN_USER_DATA U
                             ON U.DOKTER_ID = D.CREATED_BY
                             AND U.LOKASI_ID = '001'
+                            AND U.IHS_ID IS NOT NULL   -- tambahan validasi
 
                         WHERE E.LOKASI_ID='001'
                         AND   E.AKTIF='1'
