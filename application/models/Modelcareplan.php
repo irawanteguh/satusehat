@@ -4,27 +4,65 @@
         function careplan($env){
             $query =
                     "
-                        SELECT A.PASIEN_ID, EPISODE_ID, TRANS_SOAP, P,
-                               TO_CHAR(A.CREATED_DATE-INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(A.CREATED_DATE-INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' CREATED_DATE,
+                        SELECT 
+                            E.PASIEN_ID,
+                            E.EPISODE_ID,
+                            D.TRANS_SOAP,
+                            D.P,
 
-                               (SELECT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)RESOURCEID,
-                               (SELECT POLI_ID     FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)POLI_ID,
-                               (SELECT DOKTER_ID   FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)DOKTER_ID,
+                            TO_CHAR(D.CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD') ||
+                            'T' ||
+                            TO_CHAR(D.CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS') ||
+                            '+00:00' CREATED_DATE,
 
-                               --Patient Index
-                                SR01_GET_SUFFIX(A.PASIEN_ID)PATIENTNAME,
-                                (SELECT INT_PASIEN_ID FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTMR,
-                                (SELECT SATUSEHAT_ID  FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTID,
+                            E.RESOURCE_ID AS RESOURCEID,
+                            E.POLI_ID,
+                            E.DOKTER_ID,
 
-                               --Practitioner Index
-                                (SELECT IHS_ID      FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND DOKTER_ID=A.CREATED_BY)PRACTITIONERID,
-                                (SELECT UPPER(NAMA) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND DOKTER_ID=A.CREATED_BY)PRACTITIONERNAME
+                            -- Patient
+                            SR01_GET_SUFFIX(E.PASIEN_ID) AS PATIENTNAME,
+                            P.INT_PASIEN_ID AS PATIENTMR,
+                            P.SATUSEHAT_ID  AS PATIENTID,
 
-                        FROM WEB_CO_DIAGNOSA_DT A
-                        WHERE A.LOKASI_ID='001'
-                        AND   A.SHOW_ITEM='1'
-                        AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID)
-                        AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='CarePlan' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID)
+                            -- Practitioner
+                            U.IHS_ID        AS PRACTITIONERID,
+                            UPPER(U.NAMA)   AS PRACTITIONERNAME
+
+                        FROM SR01_SATUSEHAT_TRANSAKSI E
+
+                        JOIN WEB_CO_DIAGNOSA_DT D
+                            ON D.PASIEN_ID = E.PASIEN_ID
+                            AND D.EPISODE_ID = E.EPISODE_ID
+                            AND D.LOKASI_ID = '001'
+                            AND D.SHOW_ITEM = '1'
+
+                        LEFT JOIN SR01_GEN_PASIEN_MS P
+                            ON P.PASIEN_ID = E.PASIEN_ID
+                            AND P.LOKASI_ID = '001'
+                            AND P.AKTIF = '1'
+
+                        LEFT JOIN SR01_GEN_USER_DATA U
+                            ON U.DOKTER_ID = D.CREATED_BY
+                            AND U.LOKASI_ID = '001'
+
+                        WHERE E.LOKASI_ID='001'
+                        AND   E.AKTIF='1'
+                        AND   E.RESOURCE_TYPE='Encounter'
+                        AND   E.JENIS='1'
+                        AND   E.ENVIRONMENT='".$env."'
+
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM SR01_SATUSEHAT_TRANSAKSI X
+                            WHERE X.LOKASI_ID='001'
+                            AND X.AKTIF='1'
+                            AND X.RESOURCE_TYPE='CarePlan'
+                            AND X.JENIS='1'
+                            AND X.ENVIRONMENT='".$env."'
+                            AND X.PASIEN_ID=E.PASIEN_ID
+                            AND X.EPISODE_ID=E.EPISODE_ID
+                        )
+
                         FETCH FIRST 10 ROWS ONLY
                     ";
 
