@@ -249,8 +249,6 @@
                         $body['entry'][]      = $encounter;
                         $body['entry']        = array_merge($body['entry'], $conditiondiag);
 
-                        // $this->response($body);
-
                         $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
 
                         if(isset($response['entry'])){
