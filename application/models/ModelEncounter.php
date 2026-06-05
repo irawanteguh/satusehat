@@ -62,7 +62,7 @@
                         )X
                         WHERE X.CONDITION IS NOT NULL
                         AND   X.INPROGRESSEND IS NOT NULL
-                        FETCH FIRST 1 ROWS ONLY
+                        FETCH FIRST 10 ROWS ONLY
                     ";
 
 			$recordset = $this->db->query($query);
