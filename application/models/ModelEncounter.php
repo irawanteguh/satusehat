@@ -14,7 +14,7 @@
                                     AND   AKTIF='1'
                                     AND   JNS_R='F'
                                     AND   TIPE='IDRG'
-                                    AND   ICD10_ID NOT IN ('B86.9','KG27','KG16','N40.1','N40.0','KG75','R33.0','KG36')
+                                    AND   ICD10_ID NOT IN ('B86.9','KG27','KG16','N40.1','N40.0','KG75','R33.0','KG36','KG37','KG46','N40.2')
                                     AND   EPISODE_ID=A.EPISODE_ID
                                 )CONDITION,
 
