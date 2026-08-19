@@ -74,7 +74,14 @@
                         'TRANS_ID'      => $episodeid
                     ];
 
-                    $ci->mlog->saveissuelog($issuelog);
+                    if (
+                        isset($a['expression'][0]) &&
+                        !preg_match('/^Bundle\.entry\[\d+\]\.resource\.resourceType$/', $a['expression'][0]) &&
+                        !preg_match('/^Condition\.code\[\d+\]\.code$/', $a['expression'][0])
+                    ) {
+                        $ci->mlog->saveissuelog($issuelog);
+                    }
+                    
 
                     if(!empty($details)){
                         if (preg_match("/Code not found: '([^']+)'/",$details,$matches)) {
