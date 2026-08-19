@@ -42,7 +42,11 @@
                                         'F32.30',
                                         'F32.10',
                                         'KG17',
-                                        'KG18'
+                                        'KG18',
+                                        'R10.49',
+                                        'F32.30',
+                                        'KG18',
+                                        'F03.4'
                                     )
                                     AND   EPISODE_ID=A.EPISODE_ID
                                 )CONDITION,
