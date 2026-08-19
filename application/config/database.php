@@ -28,7 +28,7 @@
 
 	$db['production'] = array(
 		'dsn'	=> '',
-		'hostname' => '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=192.168.200.137)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED) (SERVICE_NAME=PRODPM)))',
+		'hostname' => '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=rac-scan.rsudpm.local)(PORT=1521))(CONNECT_DATA=(SERVER=DEDICATED) (SERVICE_NAME=PRODPM)))',
 		'username' => 'SIMRS_MANAGER',
 		'password' => 'SIMRS_SYSTEM',
 		'database' => '',
