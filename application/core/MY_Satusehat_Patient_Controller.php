@@ -6,6 +6,7 @@ class MY_Satusehat_Patient_Controller extends REST_Controller
 {
     protected $reqbody;
     protected $reqbodyjson;
+    protected $oauth;
 
     public function __construct()
     {
@@ -18,7 +19,7 @@ class MY_Satusehat_Patient_Controller extends REST_Controller
 
         Satusehat::init();
 
-        self::$oauth = Satusehat::generatedoauth();
+        $this->oauth = Satusehat::generatedoauth();
 
         headerpasien();
     }
