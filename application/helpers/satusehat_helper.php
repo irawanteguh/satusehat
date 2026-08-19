@@ -11,7 +11,7 @@
     
     function headerpasien(){
         echo PHP_EOL;
-        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("PASIEN_ID", WIDTH_PASIEN_ID).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("NAMA_PASIEN", WIDTH_NAMA_PASIEN).str_pad("GENERAL_CONSENT_DATE", WIDTH_CONSENT_DATE).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;
+        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;
     }
 
     function headerbundle(){
@@ -23,10 +23,7 @@
         $reset = color('reset');
 
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
-        $formatted .= color($colorIdentity) . str_pad($parameter1, WIDTH_PASIEN_ID) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
-        $formatted .= color($colorIdentity) . str_pad($parameter3, WIDTH_NAMA_PASIEN) . $reset;
-        $formatted .= color($colorIdentity) . str_pad($parameter4, WIDTH_CONSENT_DATE) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter5, WIDTH_SATUSEHATID) . $reset;
         $formatted .= color($colorIdentity) . $message . $reset;
 
