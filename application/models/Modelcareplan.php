@@ -65,7 +65,7 @@
                             AND X.EPISODE_ID=E.EPISODE_ID
                         )
 
-                        FETCH FIRST 10 ROWS ONLY
+                        FETCH FIRST 20 ROWS ONLY
                     ";
 
 			$recordset = $this->db->query($query);
