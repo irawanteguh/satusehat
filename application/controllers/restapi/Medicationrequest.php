@@ -208,7 +208,8 @@
                                                         $statusColor = 'white';
                                                 }
 
-                                                $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
+                                                // $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
+                                                $statusMsg = $expression;
                                                 echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','',$statusMsg,$statusColor);
                                             }else{
                                                 $statusColor = 'yellow';
