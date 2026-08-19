@@ -30,7 +30,6 @@
     }
 
     class Diagnosticreport extends MY_Satusehat_Controller{
-        public static $oauth;
 
         public function __construct(){
             parent::__construct();

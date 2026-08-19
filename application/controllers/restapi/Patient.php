@@ -30,7 +30,6 @@
     }
 
     class Patient extends MY_Satusehat_Patient_Controller{
-        public static $oauth;
 
         public function __construct(){
             parent::__construct();

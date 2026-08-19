@@ -30,7 +30,6 @@
     }
 
     class Imagestudy extends MY_Satusehat_Controller{
-        public static $oauth;
         private $dicomPath = 'E:/xampp/htdocs/rsudpasarminggu/prod/satusehat/assets/dicom';
 
         public function __construct(){
