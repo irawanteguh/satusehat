@@ -23,7 +23,7 @@ let isRunningServicesBundle = false;
 
 const BASE_URL =
     process.env.BASE_URL ||
-    "http://192.168.200.41/satusehat/index.php/";
+    "http://192.168.200.41:8080/satusehat/index.php/";
 
 console.log(
     chalk.cyan(`BASE URL : ${BASE_URL}`)
