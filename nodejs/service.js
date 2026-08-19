@@ -32,7 +32,7 @@ const services = [
     "orderrad",
     "orderlab",
     "specimenlab",
-    "dicom",
+    // "dicom",
     "diaglaboratorium",
     "careplan",
     "radiologi",
