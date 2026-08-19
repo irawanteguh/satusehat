@@ -30,21 +30,13 @@
         }
     }
 
-    class Imagestudy extends REST_Controller{
+    class Imagestudy extends MY_Satusehat_Controller{
         public static $oauth;
         private $dicomPath = 'E:/xampp/htdocs/rsudpasarminggu/prod/satusehat/assets/dicom';
 
         public function __construct(){
             parent::__construct();
             $this->load->model("Modeilimagesstudy", "md");
-            $this->load->model("Modelsatusehat", "mss");
-
-            $reqbody     = $this->input->raw_input_stream;
-            $reqbodyjson = json_decode($reqbody, true);
-
-            Satusehat::init();
-            self::$oauth  = Satusehat::generatedoauth();
-            headerbundle();
         }
         
         public function dicom_post(){

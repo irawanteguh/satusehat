@@ -30,20 +30,12 @@
         }
     }
 
-    class Procedure extends REST_Controller{
+    class Procedure extends MY_Satusehat_Controller{
         public static $oauth;
 
         public function __construct(){
             parent::__construct();
             $this->load->model("Modelprocedure", "md");
-            $this->load->model("Modelsatusehat", "mss");
-
-            $reqbody     = $this->input->raw_input_stream;
-            $reqbodyjson = json_decode($reqbody, true);
-
-            Satusehat::init();
-            self::$oauth  = Satusehat::generatedoauth();
-            headerbundle();
         }
         
         public function radiologi_post(){

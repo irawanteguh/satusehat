@@ -30,20 +30,12 @@
         }
     }
 
-    class Observation extends REST_Controller{
+    class Observation extends MY_Satusehat_Controller{
         public static $oauth;
 
         public function __construct(){
             parent::__construct();
             $this->load->model("Modelobservation", "md");
-            $this->load->model("Modelsatusehat", "mss");
-
-            $reqbody     = $this->input->raw_input_stream;
-            $reqbodyjson = json_decode($reqbody, true);
-
-            Satusehat::init();
-            self::$oauth  = Satusehat::generatedoauth();
-            headerbundle();
         }
         
 

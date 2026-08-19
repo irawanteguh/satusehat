@@ -8,7 +8,9 @@
         public static $baseurlbundle;
         public static $baseurlkfa;
         public static $baseurlconcent;
-        public static $oauth;
+
+        private static $oauth = null;
+        private static $oauthExpiredAt = 0;
 
         public static function init(){
             self::$rsid           = RS_ID;
@@ -82,6 +84,37 @@
             return $responsecurl;
         }
 
+        public static function getoauth(){
+            /*
+            * Token masih valid.
+            * Buffer 5 menit sebelum expired.
+            */
+            if(
+                !empty(self::$oauth) &&
+                time() < (self::$oauthExpiredAt - 300)
+            ){
+                return self::$oauth;
+            }
+
+            /*
+            * Token sudah expired / belum tersedia.
+            */
+            $response = self::generatedoauth();
+
+            if(
+                empty($response) ||
+                empty($response['access_token'])
+            ){
+                return null;
+            }
+
+            self::$oauth          = $response['access_token'];
+            $expiresIn            = isset($response['expires_in']) ? (int)$response['expires_in'] : 3600;
+            self::$oauthExpiredAt = time() + $expiresIn;
+
+            return self::$oauth;
+        }
+
         public static function getpatientid($nikktp,$oauth){
             $header = array("Content-Type: application/json","Authorization: Bearer ".$oauth);
 
@@ -141,8 +174,6 @@
 
             return $responsecurl;    
         }
-
-        
     }
 
 ?>
