@@ -1,8 +1,7 @@
 <?php
     defined('BASEPATH') or exit('No direct script access allowed');
     date_default_timezone_set('Asia/Jakarta');
-    use Restserver\Libraries\REST_Controller;
-    require APPPATH . '/libraries/REST_Controller.php';
+    require_once APPPATH . 'core/MY_Satusehat_Controller.php';
 
     if(!function_exists('color')){
         function color($name = null){

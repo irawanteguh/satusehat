@@ -1,5 +1,8 @@
 <?php
+
 defined('BASEPATH') OR exit('No direct script access allowed');
+
+use Restserver\Libraries\REST_Controller;
 
 require_once APPPATH . 'libraries/REST_Controller.php';
 
@@ -7,6 +10,7 @@ class MY_Satusehat_Controller extends REST_Controller
 {
     protected $reqbody;
     protected $reqbodyjson;
+    protected $oauth;
 
     public function __construct()
     {
@@ -19,7 +23,7 @@ class MY_Satusehat_Controller extends REST_Controller
 
         Satusehat::init();
 
-        self::$oauth = Satusehat::generatedoauth();
+        $this->oauth = Satusehat::generatedoauth();
 
         headerbundle();
     }

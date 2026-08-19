@@ -2,6 +2,8 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+use Restserver\Libraries\REST_Controller;
+
 require_once APPPATH . 'libraries/REST_Controller.php';
 
 class MY_Satusehat_Patient_Controller extends REST_Controller
