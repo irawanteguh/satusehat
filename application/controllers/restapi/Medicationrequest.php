@@ -210,6 +210,11 @@
 
                                                 $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
                                                 echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','',$statusMsg,$statusColor);
+                                            }else{
+                                                $statusColor = 'yellow';
+                                                $statusMsg   = "duplicate";
+
+                                                echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','',$statusMsg,$statusColor);
                                             }
                                             
                                         }
