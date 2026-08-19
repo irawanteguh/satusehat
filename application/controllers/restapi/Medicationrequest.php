@@ -135,9 +135,11 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $medicationrequest;
 
-                        // $this->response($medicationrequestresource);
+                        $this->response($body,200);
                         
                         $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
+
+                        // $this->response($response,200);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
