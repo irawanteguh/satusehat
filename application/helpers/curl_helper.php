@@ -56,7 +56,7 @@
             $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
 
             foreach ($responseerror['issue'] as $a) {
-                if($a['code']!="duplicate" && $a['code']!="Invalid access token" && $a['code']!="throttled"){
+                if($a['code']!="duplicate" && $a['code']!="Invalid access token" && $a['code']!="throttled" && $a['code']!="value"){
                     $details     = isset($a['details']['text']) ? $a['details']['text'] : null;
                     $kode        = null;
                     $codeexclude = null;
@@ -74,7 +74,7 @@
                         'TRANS_ID'      => $episodeid
                     ];
 
-                    // $ci->mlog->saveissuelog($issuelog);
+                    $ci->mlog->saveissuelog($issuelog);
 
                     if(!empty($details)){
                         if (preg_match("/Code not found: '([^']+)'/",$details,$matches)) {
