@@ -26,7 +26,7 @@ console.log(
 
 const services = [
     "patientid",
-    // "poliklinik",
+    "poliklinik",
     // "anamnesaawalrj",
     // "hasillab",
     // "orderrad",
