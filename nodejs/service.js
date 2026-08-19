@@ -284,10 +284,10 @@ async function runservicesbundle() {
         await callAPI("dicom", "POST");
         await callAPI("diaglaboratorium", "POST");
         await callAPI("careplan", "POST");
-        await callAPI("allergyintolerance", "POST");
+        // await callAPI("allergyintolerance", "POST");
         await callAPI("radiologi", "POST");
         await callAPI("cipoliklinik", "POST");
-        await callAPI("qpoliklinik", "POST");
+        // await callAPI("qpoliklinik", "POST");
         await callAPI("compoliklinik", "POST");
         await callAPI("singledose", "POST");
         await callAPI("singledosereq", "POST");
