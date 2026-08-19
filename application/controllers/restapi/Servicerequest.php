@@ -355,8 +355,8 @@
                             $patientname         = $a->PATIENTNAME;
                             $practitionerid      = $a->PRACTITIONERID;
                             $practitionername    = $a->PRACTITIONERNAME;
-                            $practitionerradid   = $a->PRACTITIONERRADID;
-                            $practitionerradname = $a->PRACTITIONERRADNAME;
+                            $practitionerradid   = $a->PRACTITIONERID;
+                            $practitionerradname = $a->PRACTITIONERNAME;
                             $locationid          = $a->LOCATIONID;
                             $locationname        = $a->LOCATIONNAME;
                         }else{
