@@ -7,8 +7,6 @@
     define('WIDTH_SATUSEHATID', 38);
     define('WIDTH_RESOURCE_TYPE', 20);
 
-    
-    
     function headerpasien(){
         echo PHP_EOL;
         echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;

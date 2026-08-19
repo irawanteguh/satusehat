@@ -306,7 +306,8 @@
                                                         $statusColor = 'white';
                                                 }
 
-                                                $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
+                                                // $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
+                                                $statusMsg = $expression;
                                                 echo formatlogbundle($pasienid,$episodeid,'Encounter','',$statusMsg,$statusColor);
                                             }
                                             

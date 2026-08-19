@@ -56,7 +56,7 @@
             $status        = isset($responseerror['text']['status']) ? $responseerror['text']['status'] : null;
 
             foreach ($responseerror['issue'] as $a) {
-                if($a['code']!="duplicate" && $a['code']!="Invalid access token" && $a['code']!="throttled" && $a['code']!="value"){
+                if($a['code']!="duplicate" && $a['code']!="Invalid access token" && $a['code']!="throttled"){
                     $details     = isset($a['details']['text']) ? $a['details']['text'] : null;
                     $kode        = null;
                     $codeexclude = null;

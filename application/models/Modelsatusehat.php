@@ -1,5 +1,6 @@
 <?php
     class Modelsatusehat extends CI_Model{
+        
         function insertdata($data){           
             $sql =   $this->db->insert("SR01_SATUSEHAT_TRANSAKSI",$data);
             return $sql;
