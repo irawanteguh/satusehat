@@ -27,19 +27,19 @@ console.log(
 const services = [
     "patientid",
     "poliklinik",
-    // "anamnesaawalrj",
-    // "hasillab",
-    // "orderrad",
-    // "orderlab",
-    // "specimenlab",
-    // "dicom",
-    // "diaglaboratorium",
-    // "careplan",
-    // "radiologi",
-    // "cipoliklinik",
-    // "compoliklinik",
-    // "singledose",
-    // "singledosereq"
+    "anamnesaawalrj",
+    "hasillab",
+    "orderrad",
+    "orderlab",
+    "specimenlab",
+    "dicom",
+    "diaglaboratorium",
+    "careplan",
+    "radiologi",
+    "cipoliklinik",
+    "compoliklinik",
+    "singledose",
+    "singledosereq"
 ];
 
 
