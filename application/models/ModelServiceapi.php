@@ -17,7 +17,6 @@
                         SELECT A.KODE
                         FROM SR01_SATUSEHAT_ICD_EXCLUDE A
                         WHERE UPPER(A.KODE)=UPPER('".$kode."')
-                        
                     ";
 
 			$recordset = $this->db->query($query);

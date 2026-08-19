@@ -2,7 +2,7 @@
 
     function curl($config){
         $ci = &get_instance();
-        $ci->load->model('Modelserviceapi', 'mlog');
+        $ci->load->model('ModelServiceapi', 'mlog');
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
