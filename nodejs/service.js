@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 import chalk from "chalk";
 
 let lebar                   = 180;
-let host                    = "localhost";
+let host                    = "192.168.200.41";
 let isRunningServices       = false;
 let isRunningServicesBundle = false;
 
