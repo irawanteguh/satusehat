@@ -50,7 +50,6 @@
                             AND A.AKTIF           = '1'
                             AND A.JENIS_EPISODE   = 'O'
                             AND A.STATUS_EPISODE  = '55'
-                            AND A.EPISODE_ID='B126073208555'
                             AND A.TGL_KELUAR IS NOT NULL
                             AND A.TGL_KELUAR >= TRUNC(SYSDATE) - 14
                             AND A.TGL_KELUAR <  TRUNC(SYSDATE) + 1
