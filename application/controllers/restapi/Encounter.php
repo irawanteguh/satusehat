@@ -239,7 +239,7 @@
                         $body['entry'][]      = $encounter;
                         $body['entry']        = array_merge($body['entry'], $conditiondiag);
 
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -319,8 +319,8 @@
                                             $responsegetcondition          = [];
                                             $responsegetconditionencounter = [];
 
-                                            $responsegetencounter = Satusehat::getdata("Encounter","identifier",$episodeid,self::$oauth['access_token']);
-                                            $responsegetcondition = Satusehat::getdata("Condition","identifier",$episodeid,self::$oauth['access_token']); 
+                                            $responsegetencounter = Satusehat::getdata("Encounter","identifier",$episodeid,$this->oauth['access_token']);
+                                            $responsegetcondition = Satusehat::getdata("Condition","identifier",$episodeid,$this->oauth['access_token']); 
 
                                             if(isset($responsegetencounter['entry'])){
                                                 foreach($responsegetencounter['entry'] as $responsegetencounters){

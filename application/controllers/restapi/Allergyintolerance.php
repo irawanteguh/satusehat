@@ -115,7 +115,7 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $alergi;
 
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -193,7 +193,7 @@
                                     if(isset($response['issue'])){
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetobservation = [];
-                                            $responsegetobservation = Satusehat::getdata("AllergyIntolerance","identifier",$identifier,self::$oauth['access_token']);
+                                            $responsegetobservation = Satusehat::getdata("AllergyIntolerance","identifier",$identifier,$this->oauth['access_token']);
 
                                             if(isset($responsegetobservation['entry'])){
                                                 foreach($responsegetobservation['entry'] as $responsegetobservations){

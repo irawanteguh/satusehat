@@ -135,7 +135,7 @@
 
                         // $this->response($procedureresource);
 
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -215,7 +215,7 @@
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetServiceRequest = [];
                                             $parameter                 = "http://sys-ids.kemkes.go.id/acsn/".RS_ID."|".$acsn;
-                                            $responsegetServiceRequest = Satusehat::getdata("Procedure","identifier",$parameter,self::$oauth['access_token']);
+                                            $responsegetServiceRequest = Satusehat::getdata("Procedure","identifier",$parameter,$this->oauth['access_token']);
 
                                             if(isset($responsegetServiceRequest['entry'])){
                                                 foreach($responsegetServiceRequest['entry'] as $responsegetServiceRequests){

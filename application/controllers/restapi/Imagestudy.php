@@ -104,7 +104,7 @@
 
                                                                 $responsegetImageStudy = [];
                                                                 $parameter             = "http://sys-ids.kemkes.go.id/acsn/".RS_ID."|".$acsn;
-                                                                $responsegetImageStudy = Satusehat::getdata("ImagingStudy","identifier",$parameter,self::$oauth['access_token']);
+                                                                $responsegetImageStudy = Satusehat::getdata("ImagingStudy","identifier",$parameter,$this->oauth['access_token']);
 
                                                                 if(isset($responsegetImageStudy['entry'])){
                                                                     foreach($responsegetImageStudy['entry'] as $responsegetImageStudys){

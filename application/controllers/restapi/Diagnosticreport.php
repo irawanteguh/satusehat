@@ -134,7 +134,7 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $diagnosticreport;
 
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -214,7 +214,7 @@
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetobservation = [];
 
-                                            $responsegetobservation = Satusehat::getdata("DiagnosticReport","identifier",$identifier,self::$oauth['access_token']);
+                                            $responsegetobservation = Satusehat::getdata("DiagnosticReport","identifier",$identifier,$this->oauth['access_token']);
 
                                             if(isset($responsegetobservation['entry'])){
                                                 foreach($responsegetobservation['entry'] as $responsegetobservations){

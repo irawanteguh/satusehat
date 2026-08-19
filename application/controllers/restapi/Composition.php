@@ -155,7 +155,7 @@
 
                         // $this->response($compositonresource);
 
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -232,7 +232,7 @@
                                     if(isset($response['issue'])){
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetServiceRequest = [];
-                                            $responsegetServiceRequest = Satusehat::getdata("Composition","encounter",$encounter,self::$oauth['access_token']);
+                                            $responsegetServiceRequest = Satusehat::getdata("Composition","encounter",$encounter,$this->oauth['access_token']);
 
                                             if(isset($responsegetServiceRequest['entry'])){
                                                 foreach($responsegetServiceRequest['entry'] as $responsegetServiceRequests){

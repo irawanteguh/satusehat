@@ -318,7 +318,7 @@
                         if(floatval($a->ANT_TB)!=0){$body['entry'][] = $tinggibadan;}
                         if(floatval($a->ANT_IMT)!=0){$body['entry'][] = $imtscale;}
                         
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -396,7 +396,7 @@
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetobservation = [];
 
-                                            $responsegetobservation = Satusehat::getdata("Observation","identifier",$transid,self::$oauth['access_token']);
+                                            $responsegetobservation = Satusehat::getdata("Observation","identifier",$transid,$this->oauth['access_token']);
 
                                             if(isset($responsegetobservation['entry'])){
                                                 foreach($responsegetobservation['entry'] as $responsegetobservations){
@@ -555,7 +555,7 @@
 
                         // $this->response($observationlabresource);
 
-                        $response = Satusehat::postbundle(json_encode($body),self::$oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
                         if(isset($response['entry'])){
                             foreach($response['entry'] as $entrys){
@@ -635,7 +635,7 @@
                                         if($response['issue'][0]['code']==="duplicate"){
                                             $responsegetobservation = [];
 
-                                            $responsegetobservation = Satusehat::getdata("Observation","identifier",$transid,self::$oauth['access_token']);
+                                            $responsegetobservation = Satusehat::getdata("Observation","identifier",$transid,$this->oauth['access_token']);
 
                                             if(isset($responsegetobservation['entry'])){
                                                 foreach($responsegetobservation['entry'] as $responsegetobservations){

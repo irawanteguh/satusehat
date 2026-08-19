@@ -56,7 +56,7 @@
                         $concentdate = $a->SATUSEHAT_DATE;
 
                         if(SERVER==="production"){
-                            $response = Satusehat::getpatientid($noidentitas,self::$oauth['access_token']);
+                            $response = Satusehat::getpatientid($noidentitas,$this->oauth['access_token']);
                             if(isset($response['entry'][0]['resource']['id'])){
                                 $satusehatid = $response['entry'][0]['resource']['id'];
 
