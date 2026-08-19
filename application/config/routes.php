@@ -5,22 +5,6 @@
     $route['404_override']         = 'Error';
     $route['translate_uri_dashes'] = FALSE;
 
-    // $route['OAuth']                       = 'restapi/OAuth/generatedoauth';
-    // $route['Patientid']                   = 'restapi/Patient/patientid';
-    // $route['Outpatient']                  = 'restapi/Encounter/rawatjalan';
-    // $route['Anamnesaawalrj']              = 'restapi/Observation/anamnesaawalrj';
-    // $route['Tindakanrj']                  = 'restapi/Procedure/tindakanrj';
-    // $route['Medicationrequestsingledose'] = 'restapi/Medicationrequest/singledose';
-
-
-    // $route['servicerequestlab']   = 'restapi/Servicerequest/servicerequestlab';
-    // $route['servicerequestrad']   = 'restapi/Servicerequest/servicerequestrad';
-    // $route['specimenlab']         = 'restapi/Specimen/specimenlab';
-    // $route['hasillab']            = 'restapi/Observation/hasillab';
-    // $route['diagnosticreportlab'] = 'restapi/Diagnosticreport/diagnosticreportlab';
-
-    
-
     $route['patientid']          = 'restapi/Patient/patientid';
     $route['poliklinik']         = 'restapi/Encounter/poliklinik';
     $route['anamnesaawalrj']     = 'restapi/Observation/anamnesaawalrj';
