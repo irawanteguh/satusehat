@@ -57,6 +57,10 @@
 
             foreach ($responseerror['issue'] as $a) {
                 if($a['code']!="duplicate" && $a['code']!="Invalid access token" && $a['code']!="throttled"){
+                    $details     = isset($a['details']['text']) ? $a['details']['text'] : null;
+                    $kode        = null;
+                    $codeexclude = null;
+
                     $issuelog = [
                         'REQUEST_ID'    => round(microtime(true) * 1000),
                         'RESOURCE_TYPE' => $resourcetype,
@@ -69,9 +73,21 @@
                         'SOURCE'        => "MIDDLEWARE",
                         'TRANS_ID'      => $episodeid
                     ];
-                    $ci->mlog->saveissuelog($issuelog);
+
+                    // $ci->mlog->saveissuelog($issuelog);
+
+                    if(!empty($details)){
+                        if (preg_match("/Code not found: '([^']+)'/",$details,$matches)) {
+                            $kode        = $matches[1];
+                            $codeexclude = $ci->mlog->checkcodeexclude($kode);
+
+                            if (empty($codeexclude)) {
+                                $codeexclude['KODE'] = $kode;
+                                $ci->mlog->codeexclude($codeexclude);
+                            }
+                        }
+                    }
                 }
-                
             }
         }
         

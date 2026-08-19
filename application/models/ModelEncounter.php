@@ -14,40 +14,7 @@
                                     AND   AKTIF='1'
                                     AND   JNS_R='F'
                                     AND   TIPE='IDRG'
-                                    AND   ICD10_ID NOT IN (
-                                        'B86.9',
-                                        'KG27',
-                                        'KG16',
-                                        'N40.1',
-                                        'N40.0',
-                                        'KG75',
-                                        'R33.0',
-                                        'KG36',
-                                        'KG37',
-                                        'KG46',
-                                        'N40.2',
-                                        'K12.21',
-                                        'KG38',
-                                        'S82.211',
-                                        'R51.0',
-                                        'F20.00',
-                                        'K01.17',
-                                        'KG48',
-                                        'KG64',
-                                        'D18.09',
-                                        'KG13',
-                                        'KG32',
-                                        'R10.49',
-                                        'F20.90',
-                                        'F32.30',
-                                        'F32.10',
-                                        'KG17',
-                                        'KG18',
-                                        'R10.49',
-                                        'F32.30',
-                                        'KG18',
-                                        'F03.4'
-                                    )
+                                    AND   ICD10_ID NOT IN (SELECT KODE FROM SR01_SATUSEHAT_ICD_EXCLUDE)
                                     AND   EPISODE_ID=A.EPISODE_ID
                                 )CONDITION,
 
@@ -83,6 +50,7 @@
                             AND A.AKTIF           = '1'
                             AND A.JENIS_EPISODE   = 'O'
                             AND A.STATUS_EPISODE  = '55'
+                            AND A.EPISODE_ID='B126073208555'
                             AND A.TGL_KELUAR IS NOT NULL
                             AND A.TGL_KELUAR >= TRUNC(SYSDATE) - 14
                             AND A.TGL_KELUAR <  TRUNC(SYSDATE) + 1
