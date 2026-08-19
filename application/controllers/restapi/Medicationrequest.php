@@ -209,7 +209,7 @@
                                                 }
 
                                                 // $statusMsg = strtoupper($severity).' | '.$diagnostics.' | '.$expression;
-                                                $statusMsg = $expression;
+                                                $statusMsg = strtoupper($severity);
                                                 echo formatlogbundle($pasienid,$episodeid,'MedicationRequest','',$statusMsg,$statusColor);
                                             }else{
                                                 $statusColor = 'yellow';
