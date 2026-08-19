@@ -7,7 +7,15 @@ const BASE_URL =
     process.env.BASE_URL ||
     "http://192.168.200.41:8080/satusehat/index.php/";
 
-const REQUEST_TIMEOUT = 5 * 60 * 1000; // 5 menit
+console.clear();
+
+console.log(
+    chalk.cyan("SATUSEHAT SERVICE STARTED")
+);
+
+console.log(
+    chalk.cyan(`BASE URL : ${BASE_URL}`)
+);
 
 
 /*
@@ -17,9 +25,7 @@ const REQUEST_TIMEOUT = 5 * 60 * 1000; // 5 menit
 */
 
 const services = [
-
     "patientid",
-
     "poliklinik",
     "anamnesaawalrj",
     "hasillab",
@@ -29,30 +35,26 @@ const services = [
     "dicom",
     "diaglaboratorium",
     "careplan",
-
     // "allergyintolerance",
-
     "radiologi",
     "cipoliklinik",
-
     // "qpoliklinik",
-
     "compoliklinik",
     "singledose",
     "singledosereq"
-
 ];
 
 
-console.log(
-    chalk.cyan(`BASE URL : ${BASE_URL}`)
-);
+/*
+|--------------------------------------------------------------------------
+| TIMEOUT
+|--------------------------------------------------------------------------
+|
+| Maksimal 5 menit per request
+|
+*/
 
-console.log(
-    chalk.cyan(
-        `REQUEST TIMEOUT : ${REQUEST_TIMEOUT / 60000} MENIT`
-    )
-);
+const REQUEST_TIMEOUT = 5 * 60 * 1000;
 
 
 /*
@@ -147,7 +149,7 @@ function logRow(
 
 async function callAPI(
     endpoint,
-    method = "GET",
+    method = "POST",
     body = null
 ) {
 
@@ -155,21 +157,12 @@ async function callAPI(
 
     const controller = new AbortController();
 
-    /*
-    |--------------------------------------------------------------------------
-    | TIMEOUT 5 MENIT
-    |--------------------------------------------------------------------------
-    */
-
     const timeout = setTimeout(() => {
-
         controller.abort();
-
     }, REQUEST_TIMEOUT);
 
 
     const options = {
-
         method,
 
         headers: {
@@ -177,7 +170,6 @@ async function callAPI(
         },
 
         signal: controller.signal
-
     };
 
 
@@ -188,45 +180,16 @@ async function callAPI(
     }
 
 
-    const startTime = Date.now();
-
-
     try {
-
-        console.log(
-            chalk.yellow(
-                `\n>>> START : ${endpoint}`
-            )
-        );
-
-        console.log(
-            chalk.gray(
-                `URL     : ${url}`
-            )
-        );
-
-        console.log(
-            chalk.gray(
-                `TIMEOUT : ${REQUEST_TIMEOUT / 60000} menit`
-            )
-        );
-
 
         const response = await fetch(
             url,
             options
         );
 
-
         const text = await response.text();
 
-
-        const duration =
-            ((Date.now() - startTime) / 1000).toFixed(2);
-
-
-        clearTimeout(timeout);
-
+        const timestamp = getTimeStamp();
 
         logHeader();
 
@@ -240,18 +203,12 @@ async function callAPI(
         if (!response.ok) {
 
             logRow(
-                getTimeStamp(),
+                timestamp,
                 method,
                 endpoint,
                 response.status,
-                `${response.statusText} | ${duration}s`,
+                `${response.statusText} : ${url}`,
                 "red"
-            );
-
-            console.log(
-                chalk.red(
-                    `<<< ERROR : ${endpoint}`
-                )
             );
 
             return null;
@@ -268,16 +225,14 @@ async function callAPI(
 
             const data = JSON.parse(text);
 
-
             logRow(
-                getTimeStamp(),
+                timestamp,
                 method,
                 endpoint,
                 response.status,
-                `${response.statusText} | ${duration}s`,
+                `${response.statusText} : ${url}`,
                 "green"
             );
-
 
             console.log(
                 chalk.gray(
@@ -289,60 +244,34 @@ async function callAPI(
                 )
             );
 
-
-            console.log(
-                chalk.green(
-                    `<<< FINISH : ${endpoint} | ${duration}s`
-                )
-            );
-
-
             return data;
-
 
         } catch {
 
             /*
             |--------------------------------------------------------------------------
-            | PLAIN TEXT
+            | PLAIN TEXT RESPONSE
             |--------------------------------------------------------------------------
             */
 
             logRow(
-                getTimeStamp(),
+                timestamp,
                 method,
                 endpoint,
                 response.status,
-                `${response.statusText} | ${duration}s`,
+                response.statusText,
                 "green"
             );
-
 
             console.log(
                 chalk.gray(text)
             );
 
-
-            console.log(
-                chalk.green(
-                    `<<< FINISH : ${endpoint} | ${duration}s`
-                )
-            );
-
-
             return text;
-
         }
 
 
     } catch (error) {
-
-        clearTimeout(timeout);
-
-
-        const duration =
-            ((Date.now() - startTime) / 1000).toFixed(2);
-
 
         logHeader();
 
@@ -360,20 +289,11 @@ async function callAPI(
                 method,
                 endpoint,
                 "TIMEOUT",
-                `Request lebih dari 5 menit | ${duration}s`,
-                "red"
+                `Request timeout : ${url}`,
+                "yellow"
             );
-
-
-            console.log(
-                chalk.red(
-                    `<<< TIMEOUT : ${endpoint}`
-                )
-            );
-
 
             return null;
-
         }
 
 
@@ -388,22 +308,18 @@ async function callAPI(
             method,
             endpoint,
             "NETWORK",
-            `${error.message} | ${duration}s`,
+            `${error.message} : ${url}`,
             "red"
         );
 
-
-        console.log(
-            chalk.red(
-                `<<< NETWORK ERROR : ${endpoint}`
-            )
-        );
-
-
         return null;
 
-    }
 
+    } finally {
+
+        clearTimeout(timeout);
+
+    }
 }
 
 
@@ -415,159 +331,37 @@ async function callAPI(
 
 async function runServices() {
 
-    console.log(
-        chalk.cyan(
-            "\n\n=============================================="
-        )
-    );
-
-    console.log(
-        chalk.cyan(
-            "START SERVICE QUEUE"
-        )
-    );
-
-    console.log(
-        chalk.cyan(
-            `TOTAL SERVICE : ${services.length}`
-        )
-    );
-
-    console.log(
-        chalk.cyan(
-            "==============================================\n"
-        )
-    );
-
-
-    for (let i = 0; i < services.length; i++) {
-
-        const endpoint = services[i];
-
-
-        console.log(
-            chalk.blue(
-                `\n[${i + 1}/${services.length}] ${endpoint}`
-            )
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | CALL SERVICE
-        |--------------------------------------------------------------------------
-        */
-
-        await callAPI(
-            endpoint,
-            "POST"
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SERVICE SELESAI / ERROR / TIMEOUT
-        |--------------------------------------------------------------------------
-        |
-        | Apapun hasilnya, langsung lanjut service berikutnya.
-        |
-        */
-
-        console.log(
-            chalk.gray(
-                `NEXT SERVICE : ${
-                    services[i + 1] || services[0]
-                }`
-            )
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SEMUA SELESAI
-    |--------------------------------------------------------------------------
-    */
-
-    console.log(
-        chalk.cyan(
-            "\n=============================================="
-        )
-    );
-
-    console.log(
-        chalk.cyan(
-            "SEMUA SERVICE SELESAI"
-        )
-    );
-
-    console.log(
-        chalk.cyan(
-            "RESTART DARI SERVICE PERTAMA"
-        )
-    );
-
-    console.log(
-        chalk.cyan(
-            "==============================================\n"
-        )
-    );
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| MAIN LOOP
-|--------------------------------------------------------------------------
-*/
-
-async function main() {
-
-    console.clear();
-
-
-    console.log(
-        chalk.cyan(
-            "SATUSEHAT SERVICE STARTED"
-        )
-    );
-
-
-    console.log(
-        chalk.cyan(
-            `BASE URL : ${BASE_URL}`
-        )
-    );
-
-
-    console.log(
-        chalk.cyan(
-            `TOTAL SERVICE : ${services.length}`
-        )
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | LOOP SELAMANYA
-    |--------------------------------------------------------------------------
-    */
-
     while (true) {
 
-        try {
+        for (const endpoint of services) {
 
-            await runServices();
+            try {
 
-        } catch (error) {
+                await callAPI(
+                    endpoint,
+                    "POST"
+                );
 
-            console.log(
-                chalk.red(
-                    `MAIN LOOP ERROR : ${error.message}`
-                )
-            );
+            } catch (error) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | Jangan sampai satu service menghentikan queue
+                |--------------------------------------------------------------------------
+                */
+
+                logHeader();
+
+                logRow(
+                    getTimeStamp(),
+                    "POST",
+                    endpoint,
+                    "ERROR",
+                    error.message,
+                    "red"
+                );
+
+            }
 
         }
 
@@ -576,4 +370,10 @@ async function main() {
 }
 
 
-main();
+/*
+|--------------------------------------------------------------------------
+| START
+|--------------------------------------------------------------------------
+*/
+
+runServices();
