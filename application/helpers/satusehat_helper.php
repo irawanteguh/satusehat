@@ -7,15 +7,11 @@
     define('WIDTH_SATUSEHATID', 15);
     define('WIDTH_RESOURCE_TYPE', 20);
 
-    // function headerpasien(){
-    //     echo PHP_EOL;
-    //     echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;
-    // }
-
     function headerpasien(){
         echo PHP_EOL;
-        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID);
+        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;
     }
+
 
     function headerbundle(){
         echo PHP_EOL;
@@ -28,7 +24,7 @@
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter5, WIDTH_SATUSEHATID) . $reset;
-        // $formatted .= color($colorIdentity) . $message . $reset;
+        $formatted .= color($colorIdentity) . $message . $reset;
 
         return $formatted . PHP_EOL;
     }
