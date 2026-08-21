@@ -95,7 +95,7 @@ function logHeader() {
         chalk.cyan(
             "TIMESTAMP".padEnd(20)
             +"METHOD".padEnd(7)
-            +"ENDPOINT".padEnd(32)
+            +"ENDPOINT".padEnd(30)
             +"STATUS".padEnd(16)
             // +"MESSAGE"
         )
@@ -132,7 +132,7 @@ function logRow(
     console.log(
         chalk.white(timestamp.padEnd(20))
          +chalk.white(method.padEnd(7))
-         +chalk.white(endpoint.padEnd(32))
+         +chalk.white(endpoint.padEnd(30))
          +colorStatus(String(status).padEnd(16))
         //  +chalk.white(message)
     );
