@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import chalk from "chalk";
 
-const lebar = 80;
+const lebar = 70;
 
 const BASE_URL =
     process.env.BASE_URL ||
