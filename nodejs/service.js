@@ -9,13 +9,13 @@ const BASE_URL =
 
 console.clear();
 
-console.log(
-    chalk.cyan("SATUSEHAT SERVICE STARTED")
-);
+// console.log(
+//     chalk.cyan("SATUSEHAT SERVICE STARTED")
+// );
 
-console.log(
-    chalk.cyan(`BASE URL : ${BASE_URL}`)
-);
+// console.log(
+//     chalk.cyan(`BASE URL : ${BASE_URL}`)
+// );
 
 
 /*
