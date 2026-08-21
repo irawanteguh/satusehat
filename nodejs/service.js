@@ -130,7 +130,7 @@ function logRow(
                 : chalk.green;
 
     console.log(
-        chalk.white(timestamp.padEnd(24)) +
+        chalk.white(timestamp.padEnd(20)) +
         chalk.white(method.padEnd(9)) +
         chalk.white(endpoint.padEnd(32)) +
         colorStatus(String(status).padEnd(16)) +
