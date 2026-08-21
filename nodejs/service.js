@@ -93,7 +93,7 @@ function logHeader() {
 
     console.log(
         chalk.cyan(
-            "TIMESTAMP".padEnd(24) +
+            "TIMESTAMP".padEnd(20) +
             "METHOD".padEnd(9) +
             "ENDPOINT".padEnd(32) +
             "STATUS".padEnd(16) +
