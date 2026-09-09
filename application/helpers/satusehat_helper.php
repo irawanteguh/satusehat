@@ -40,7 +40,7 @@
 
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
         // $formatted .= color($colorIdentity) . str_pad($parameter1, WIDTH_PASIEN_ID) . $reset;
-        // $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
+        $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter3, WIDTH_RESOURCE_TYPE) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter4, WIDTH_SATUSEHATID) . $reset;
         $formatted .= color($colorIdentity) . str_pad($message, WIDTH_MESSAGE) . $reset;
