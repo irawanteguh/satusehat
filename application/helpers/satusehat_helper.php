@@ -6,10 +6,11 @@
     define('WIDTH_CONSENT_DATE', 22);
     define('WIDTH_SATUSEHATID', 37);
     define('WIDTH_RESOURCE_TYPE', 20);
+    define('WIDTH_MESSAGE', 20);
 
     function headerpasien(){
         echo PHP_EOL;
-        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;
+        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID).str_pad("MESSAGE", WIDTH_MESSAGE).PHP_EOL;
     }
 
 
@@ -20,7 +21,7 @@
 
     function headerbundle(){
         echo PHP_EOL;
-        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("RESOURCE_TYPE", WIDTH_RESOURCE_TYPE).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID)."MESSAGE".PHP_EOL;
+        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("RESOURCE_TYPE", WIDTH_RESOURCE_TYPE).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID).str_pad("MESSAGE", WIDTH_MESSAGE).PHP_EOL;
     }
 
     function formatlogpasien($parameter1,$parameter2,$parameter3,$parameter4,$parameter5,$message,$colorIdentity='cyan'){
@@ -29,7 +30,7 @@
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter5, WIDTH_SATUSEHATID) . $reset;
-        $formatted .= color($colorIdentity) . $message . $reset;
+        $formatted .= color($colorIdentity) . str_pad($message, WIDTH_MESSAGE) . $reset;
 
         return $formatted . PHP_EOL;
     }
@@ -42,7 +43,7 @@
         // $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter3, WIDTH_RESOURCE_TYPE) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter4, WIDTH_SATUSEHATID) . $reset;
-        $formatted .= color($colorIdentity) . $message . $reset;
+        $formatted .= color($colorIdentity) . str_pad($message, WIDTH_MESSAGE) . $reset;
 
         return $formatted . PHP_EOL;
     }
