@@ -21,7 +21,7 @@
 
     function headerbundle(){
         echo PHP_EOL;
-        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("RESOURCE_TYPE", WIDTH_RESOURCE_TYPE).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID).str_pad("MESSAGE", WIDTH_MESSAGE).PHP_EOL;
+        echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("EPISODE_ID", WIDTH_NO_IDENTITAS).str_pad("RESOURCE_TYPE", WIDTH_RESOURCE_TYPE).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID).str_pad("MESSAGE", WIDTH_MESSAGE).PHP_EOL;
     }
 
     function formatlogpasien($parameter1,$parameter2,$parameter3,$parameter4,$parameter5,$message,$colorIdentity='cyan'){
