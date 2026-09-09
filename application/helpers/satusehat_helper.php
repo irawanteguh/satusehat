@@ -43,7 +43,7 @@
         $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter3, WIDTH_RESOURCE_TYPE) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter4, WIDTH_SATUSEHATID) . $reset;
-        $formatted .= color($colorIdentity) . str_pad($message, WIDTH_MESSAGE) . $reset;
+        $formatted .= color($colorIdentity) . $message . $reset;
 
         return $formatted . PHP_EOL;
     }
