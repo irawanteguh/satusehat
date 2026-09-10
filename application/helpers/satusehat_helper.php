@@ -4,7 +4,7 @@
     define('WIDTH_NO_IDENTITAS', 18);
     define('WIDTH_NAMA_PASIEN', 50);
     define('WIDTH_CONSENT_DATE', 22);
-    define('WIDTH_SATUSEHATID', 37);
+    define('WIDTH_SATUSEHATID', 38);
     define('WIDTH_RESOURCE_TYPE', 20);
     define('WIDTH_MESSAGE', 20);
 
