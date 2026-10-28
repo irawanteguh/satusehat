@@ -6,14 +6,14 @@ use Restserver\Libraries\REST_Controller;
 
 require_once APPPATH . 'libraries/REST_Controller.php';
 
-class MY_Satusehat_Controller extends REST_Controller
-{
+class MY_Satusehat_Controller extends REST_Controller{
+
     protected $reqbody;
     protected $reqbodyjson;
     protected $oauth;
 
-    public function __construct()
-    {
+    public function __construct(){
+
         parent::__construct();
 
         $this->load->model("Modelsatusehat", "mss");

@@ -1,99 +1,132 @@
 <?php
     class Modelallergyintolerance extends CI_Model{
 
-        function alergi($env){
-            $query =
-                    "
-                        SELECT X.*
-                        FROM(
-                        SELECT /*+ USE_NL(A PAS U EP ST) */
-                            DISTINCT
-                            A.PASIEN_ID, A.CREATED_BY,
+        // function alergi($env){
+        //     $query =
+        //             "
+        //                 SELECT X.*
+        //                 FROM(
+        //                 SELECT /*+ USE_NL(A PAS U EP ST) */
+        //                     DISTINCT
+        //                     A.PASIEN_ID, A.CREATED_BY,
 
-                            TO_CHAR(A.CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD') || 'T' ||
-                            TO_CHAR(A.CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS') || '+00:00' AS CREATED_DATE,
+        //                     TO_CHAR(A.CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD') || 'T' ||
+        //                     TO_CHAR(A.CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS') || '+00:00' AS CREATED_DATE,
 
-                            -- Patient
-                            SR01_GET_SUFFIX(A.PASIEN_ID) AS PATIENTNAME,
-                            PAS.INT_PASIEN_ID            AS PATIENTMR,
-                            PAS.SATUSEHAT_ID             AS PATIENTID,
+        //                     -- Patient
+        //                     SR01_GET_SUFFIX(A.PASIEN_ID) AS PATIENTNAME,
+        //                     PAS.INT_PASIEN_ID            AS PATIENTMR,
+        //                     PAS.SATUSEHAT_ID             AS PATIENTID,
 
-                            -- Practitioner
-                            U.IHS_ID                     AS PRACTITIONERID,
-                            UPPER(U.NAMA)                AS PRACTITIONERNAME,
+        //                     -- Practitioner
+        //                     U.IHS_ID                     AS PRACTITIONERID,
+        //                     UPPER(U.NAMA)                AS PRACTITIONERNAME,
 
-                            -- Episode
-                            EP.EPISODE_ID,
+        //                     -- Episode
+        //                     EP.EPISODE_ID,
 
-                            -- Encounter (Satusehat)
-                            ST.RESOURCE_ID               AS RESOURCEID,
-                            ST.POLI_ID,
-                            ST.DOKTER_ID
+        //                     -- Encounter (Satusehat)
+        //                     ST.RESOURCE_ID               AS RESOURCEID,
+        //                     ST.POLI_ID,
+        //                     ST.DOKTER_ID
 
-                        FROM WEB_CO_ALERGI_DT A
+        //                 FROM WEB_CO_ALERGI_DT A
 
-                        JOIN SR01_GEN_PASIEN_MS PAS
-                            ON PAS.PASIEN_ID = A.PASIEN_ID
-                            AND PAS.LOKASI_ID = '001'
-                            AND PAS.AKTIF     = '1'
+        //                 JOIN SR01_GEN_PASIEN_MS PAS
+        //                     ON PAS.PASIEN_ID = A.PASIEN_ID
+        //                     AND PAS.LOKASI_ID = '001'
+        //                     AND PAS.AKTIF     = '1'
 
-                        LEFT JOIN SR01_GEN_USER_DATA U
-                            ON (
-                                    U.DOKTER_ID = A.CREATED_BY
-                                OR 'SIRS01_'||U.USER_ID =  A.CREATED_BY
-                                )
-                            AND U.LOKASI_ID = '001'
-                            AND U.AKTIF     = '1'
+        //                 LEFT JOIN SR01_GEN_USER_DATA U
+        //                     ON (
+        //                             U.DOKTER_ID = A.CREATED_BY
+        //                         OR 'SIRS01_'||U.USER_ID =  A.CREATED_BY
+        //                         )
+        //                     AND U.LOKASI_ID = '001'
+        //                     AND U.AKTIF     = '1'
 
-                        LEFT JOIN SR01_KEU_EPISODE EP
-                            ON EP.PASIEN_ID = A.PASIEN_ID
-                            AND EP.AKTIF     = '1'
-                            AND A.CREATED_DATE >= EP.TGL_MASUK
-                            AND A.CREATED_DATE <  NVL(EP.TGL_KELUAR + 1, A.CREATED_DATE + 1)
+        //                 LEFT JOIN SR01_KEU_EPISODE EP
+        //                     ON EP.PASIEN_ID = A.PASIEN_ID
+        //                     AND EP.AKTIF     = '1'
+        //                     AND A.CREATED_DATE >= EP.TGL_MASUK
+        //                     AND A.CREATED_DATE <  NVL(EP.TGL_KELUAR + 1, A.CREATED_DATE + 1)
 
-                        LEFT JOIN SR01_SATUSEHAT_TRANSAKSI ST
-                            ON ST.LOKASI_ID     = '001'
-                            AND ST.AKTIF         = '1'
-                            AND ST.RESOURCE_TYPE = 'Encounter'
-                            AND ST.JENIS         = '1'
-                            AND ST.ENVIRONMENT   = '".$env."'
-                            AND ST.PASIEN_ID     = A.PASIEN_ID
-                            AND ST.EPISODE_ID    = EP.EPISODE_ID
+        //                 LEFT JOIN SR01_SATUSEHAT_TRANSAKSI ST
+        //                     ON ST.LOKASI_ID     = '001'
+        //                     AND ST.AKTIF         = '1'
+        //                     AND ST.RESOURCE_TYPE = 'Encounter'
+        //                     AND ST.JENIS         = '1'
+        //                     AND ST.ENVIRONMENT   = '".$env."'
+        //                     AND ST.PASIEN_ID     = A.PASIEN_ID
+        //                     AND ST.EPISODE_ID    = EP.EPISODE_ID
 
-                        WHERE A.SHOW_ITEM = '1'
-                        AND   UPPER(A.ALERGI) = 'TIDAK ADA'
-                        AND   A.CREATED_BY<>'SIMRS_MANAGER'
-                        AND   EXISTS (
-                                SELECT 1
-                                FROM SR01_SATUSEHAT_TRANSAKSI T
-                                WHERE T.LOKASI_ID     = '001'
-                                AND   T.AKTIF         = '1'
-                                AND   T.RESOURCE_TYPE = 'Encounter'
-                                AND   T.JENIS         = '1'
-                                AND   T.ENVIRONMENT   = '".$env."'
-                                AND   T.PASIEN_ID     = A.PASIEN_ID
-                                AND   T.EPISODE_ID    = EP.EPISODE_ID
-                            )
-                        AND   NOT EXISTS (
-                                            SELECT 1
-                                            FROM SR01_SATUSEHAT_TRANSAKSI T
-                                            WHERE T.LOKASI_ID     = '001'
-                                            AND   T.AKTIF         = '1'
-                                            AND   T.RESOURCE_TYPE = 'AllergyIntolerance'
-                                            AND   T.JENIS         = '1'
-                                            AND   T.ENVIRONMENT   = '".$env."'
-                                            AND   T.PASIEN_ID     = A.PASIEN_ID
-                                            AND   T.EPISODE_ID    = EP.EPISODE_ID
-                                        )
-                        )X
-                        WHERE X.PRACTITIONERID IS NOT NULL
-                        FETCH FIRST 1 ROWS ONLY
+        //                 WHERE A.SHOW_ITEM = '1'
+        //                 AND   UPPER(A.ALERGI) = 'TIDAK ADA'
+        //                 AND   A.CREATED_BY<>'SIMRS_MANAGER'
+        //                 AND   EXISTS (
+        //                         SELECT 1
+        //                         FROM SR01_SATUSEHAT_TRANSAKSI T
+        //                         WHERE T.LOKASI_ID     = '001'
+        //                         AND   T.AKTIF         = '1'
+        //                         AND   T.RESOURCE_TYPE = 'Encounter'
+        //                         AND   T.JENIS         = '1'
+        //                         AND   T.ENVIRONMENT   = '".$env."'
+        //                         AND   T.PASIEN_ID     = A.PASIEN_ID
+        //                         AND   T.EPISODE_ID    = EP.EPISODE_ID
+        //                     )
+        //                 AND   NOT EXISTS (
+        //                                     SELECT 1
+        //                                     FROM SR01_SATUSEHAT_TRANSAKSI T
+        //                                     WHERE T.LOKASI_ID     = '001'
+        //                                     AND   T.AKTIF         = '1'
+        //                                     AND   T.RESOURCE_TYPE = 'AllergyIntolerance'
+        //                                     AND   T.JENIS         = '1'
+        //                                     AND   T.ENVIRONMENT   = '".$env."'
+        //                                     AND   T.PASIEN_ID     = A.PASIEN_ID
+        //                                     AND   T.EPISODE_ID    = EP.EPISODE_ID
+        //                                 )
+        //                 )X
+        //                 WHERE X.PRACTITIONERID IS NOT NULL
+        //                 FETCH FIRST 1 ROWS ONLY
 
-                    ";
+        //             ";
 
-			$recordset = $this->db->query($query);
-			$recordset = $recordset->result();
-			return $recordset;
-        }
+		// 	$recordset = $this->db->query($query);
+		// 	$recordset = $recordset->result();
+		// 	return $recordset;
+        // }
+
+        // function alergipasienigd($env){
+        //     $query =
+        //             "
+        //                 SELECT A.TRANS_ID, PASIEN_ID, EPISODE_ID,
+        //                         (SELECT DISTINCT RESOURCE_ID FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND JENIS='2' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID ORDER BY CREATED_DATE FETCH FIRST 1 ROW ONLY)RESOURCE_ID,
+        //                         (SELECT DISTINCT POLI_ID     FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND JENIS='2' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID ORDER BY CREATED_DATE FETCH FIRST 1 ROW ONLY)POLI_ID,
+        //                         (SELECT DISTINCT DOKTER_ID   FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND JENIS='2' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID ORDER BY CREATED_DATE FETCH FIRST 1 ROW ONLY)DOKTER_ID,
+        //                         TO_CHAR(CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' TRIAGE,
+
+        //                         --Patient Index
+        //                         SR01_GET_SUFFIX(A.PASIEN_ID)PATIENTNAME,
+        //                         (SELECT INT_PASIEN_ID FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTMR,
+        //                         (SELECT SATUSEHAT_ID  FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTID,
+
+        //                         --Practitioner Index
+        //                         (SELECT IHS_ID      FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND 'SIRS01_'||UPPER(USER_ID)=UPPER(A.CREATED_BY))PRACTITIONERID,
+        //                         (SELECT UPPER(NAMA) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND 'SIRS01_'||UPPER(USER_ID)=UPPER(A.CREATED_BY))PRACTITIONERNAME
+
+        //                 FROM SR01_MED_TRIAGE_HD_V2 A
+        //                 WHERE A.AKTIF='1'
+        //                 AND   A.ISMANUAL='E'
+        //                 AND   A.ALRGI_TIDAK='True'
+        //                 AND   A.CREATED_BY=(SELECT 'SIRS01_'||UPPER(USER_ID) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND IHS_ID IS NOT NULL AND IHS_ID<>'NOT FOUND' AND 'SIRS01_'||UPPER(USER_ID)=UPPER(A.CREATED_BY))
+        //                 AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.POLI_ID='UGD01' AND T.RESOURCE_TYPE='Encounter' AND T.JENIS='2' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+        //                 AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='AllergyIntolerance' AND T.JENIS='2' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+
+        //             ";
+
+		// 	$recordset = $this->db->query($query);
+		// 	$recordset = $recordset->result();
+		// 	return $recordset;
+        // }
     }
 ?>

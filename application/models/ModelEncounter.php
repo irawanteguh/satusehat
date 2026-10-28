@@ -60,10 +60,71 @@
                             AND EXISTS (SELECT 1 FROM SR01_RESUME_MEDIS R WHERE R.LOKASI_ID='001' AND R.AKTIF IN ('1','2') AND R.APPROVE_DR='Y' AND R.IS_CASEMIX='Y' AND R.EPISODE_ID=A.EPISODE_ID)
                             -- AND NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_ISSUE_LOG T WHERE T.TRANS_ID=A.EPISODE_ID )
                             AND NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
-                            -- ORDER BY TGL_MASUK DESC
                         )X
                         WHERE X.CONDITION IS NOT NULL
                         AND   X.INPROGRESSEND IS NOT NULL
+                        FETCH FIRST 10 ROWS ONLY
+                    ";
+
+			$recordset = $this->db->query($query);
+			$recordset = $recordset->result();
+			return $recordset;
+        }
+
+        function igd($env){
+            $query =
+                    "
+                        SELECT X.*
+                        FROM(
+                            SELECT A.PASIEN_ID, EPISODE_ID, POLI_ID, SR01_GET_DOKTERID_IGD_AKHIR(A.EPISODE_ID)DOKTER_ID,
+                                TO_CHAR(TGL_KELUAR - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(TGL_KELUAR - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' PERIODSTART,
+                                (
+                                    SELECT LISTAGG(ICD10_ID||';'||DIAGNOSA, '|')WITHIN GROUP (ORDER BY JENIS ASC, DIAGNOSA ASC)
+                                    FROM SR01_RM_RESUME_ICD10
+                                    WHERE LOKASI_ID='001'
+                                    AND   AKTIF='1'
+                                    AND   JNS_R='F'
+                                    AND   TIPE='IDRG'
+                                    AND   ICD10_ID NOT IN (SELECT KODE FROM SR01_SATUSEHAT_ICD_EXCLUDE)
+                                    AND   EPISODE_ID=A.EPISODE_ID
+                                )CONDITION,
+
+                                --Patient Index
+                                SR01_GET_SUFFIX(A.PASIEN_ID)PATIENTNAME,
+                                (SELECT INT_PASIEN_ID FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTMR,
+                                (SELECT SATUSEHAT_ID  FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND PASIEN_ID=A.PASIEN_ID)PATIENTID,
+
+                                --Location
+                                (SELECT SATUSEHAT_ID  FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=A.POLI_ID)LOCATIONID,
+                                (SELECT NAME          FROM SR01_SATUSEHAT_LOCATION WHERE LOKASI_ID='001' AND AKTIF='1' AND STATUS='active' AND VALUE=A.POLI_ID)LOCATIONNAME,
+
+                                --Practitioner Index
+                                (SELECT IHS_ID      FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND DOKTER_ID=SR01_GET_DOKTERID_IGD_AKHIR(A.EPISODE_ID))PRACTITIONERID,
+                                (SELECT UPPER(NAMA) FROM SR01_GEN_USER_DATA WHERE LOKASI_ID='001' AND AKTIF='1' AND DOKTER_ID=SR01_GET_DOKTERID_IGD_AKHIR(A.EPISODE_ID))PRACTITIONERNAME,
+
+                                CASE
+                                    WHEN TGL_KELUAR < TRUNC(LAST_UPDATED_DATE) THEN
+                                    TO_CHAR(LAST_UPDATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(LAST_UPDATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00'
+                                    ELSE
+                                    TO_CHAR(TGL_KELUAR - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(TGL_KELUAR - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00'
+                                END FINISH
+                                                                                
+                            FROM SR01_KEU_EPISODE A
+                            WHERE A.LOKASI_ID     = '001'
+                            AND A.AKTIF           = '1'
+                            AND A.JENIS_EPISODE   = 'O'
+                            AND A.STATUS_EPISODE  = '55'
+                            AND A.POLI_ID='UGD01'
+                            AND A.TGL_KELUAR >= DATE '2026-01-01'
+                            AND TRUNC(A.TGL_MASUK) >= (SELECT TRUNC(SATUSEHAT_DATE) FROM SR01_GEN_PASIEN_MS WHERE LOKASI_ID='001' AND AKTIF='1' AND ACC_SATUSEHAT='Y' AND SATUSEHAT_ID IS NOT NULL AND PASIEN_ID=A.PASIEN_ID)
+                            AND EXISTS (SELECT 1 FROM SR01_GEN_PASIEN_MS P WHERE P.LOKASI_ID='001' AND P.AKTIF='1' AND P.ACC_SATUSEHAT='Y' AND P.SATUSEHAT_ID IS NOT NULL AND P.SATUSEHAT_ID NOT IN ('NOT FOUND','X') AND P.ACC_SATUSEHAT_FASKES IS NOT NULL AND P.PASIEN_ID=A.PASIEN_ID)
+                            AND EXISTS (SELECT 1 FROM SR01_SATUSEHAT_LOCATION L WHERE L.LOKASI_ID='001' AND L.AKTIF='1' AND L.STATUS='active' AND L.VALUE=A.POLI_ID)
+                            AND EXISTS (SELECT 1 FROM SR01_GEN_USER_DATA U WHERE U.LOKASI_ID='001' AND U.AKTIF='1' AND U.IHS_ID IS NOT NULL AND U.IHS_ID <> 'NOT FOUND' AND U.DOKTER_ID=SR01_GET_DOKTERID_IGD_AKHIR(A.EPISODE_ID))
+                            AND EXISTS (SELECT 1 FROM SR01_RESUME_MEDIS R WHERE R.LOKASI_ID='001' AND R.AKTIF IN ('1','2') AND R.APPROVE_DR='Y' AND R.IS_CASEMIX='Y' AND R.EPISODE_ID=A.EPISODE_ID)
+                            AND NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI T WHERE T.LOKASI_ID='001' AND T.AKTIF='1' AND T.RESOURCE_TYPE='Encounter' AND T.JENIS='1' AND T.ENVIRONMENT='".$env."' AND T.PASIEN_ID=A.PASIEN_ID AND T.EPISODE_ID=A.EPISODE_ID )
+                        )X
+                        WHERE X.CONDITION IS NOT NULL
+                        AND   X.PRACTITIONERID IS NOT NULL
                         FETCH FIRST 10 ROWS ONLY
                     ";
 

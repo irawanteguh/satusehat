@@ -42,5 +42,4 @@
         return $formatted . PHP_EOL;
     }
 
-
 ?>

@@ -1,377 +1,205 @@
+import os from "os";
 import fetch from "node-fetch";
 import chalk from "chalk";
 
-const lebar = 135;
-
-const BASE_URL =
-    process.env.BASE_URL ||
-    "http://192.168.200.41:8080/satusehat/index.php/";
-
-console.clear();
-
-// console.log(
-//     chalk.cyan("SATUSEHAT SERVICE STARTED")
-// );
-
-// console.log(
-//     chalk.cyan(`BASE URL : ${BASE_URL}`)
-// );
+let lebar             = 135;
+let host              = "localhost";
+let isRunningServices = false;
 
 
-/*
-|--------------------------------------------------------------------------
-| SERVICE QUEUE
-|--------------------------------------------------------------------------
-*/
+const interfaces = os.networkInterfaces();
+for (const iface of Object.values(interfaces)) {
+    for (const info of iface) {
+        if (info.family === "IPv4" && !info.internal) {
+            host = info.address;
+            break;
+        }
+    }
+}
 
-const services = [
-    "patientid",
-    "poliklinik",
-    "anamnesaawalrj",
-    "hasillab",
-    "orderrad",
-    "orderlab",
-    "specimenlab",
-    // "dicom",
-    "diaglaboratorium",
-    "careplan",
-    "radiologi",
-    "cipoliklinik",
-    "compoliklinik",
-    "singledose",
-    "singledosereq"
-];
-
-
-/*
-|--------------------------------------------------------------------------
-| TIMEOUT
-|--------------------------------------------------------------------------
-|
-| Maksimal 5 menit per request
-|
-*/
-
-const REQUEST_TIMEOUT = 5 * 60 * 1000;
-
-
-/*
-|--------------------------------------------------------------------------
-| TIMESTAMP
-|--------------------------------------------------------------------------
-*/
+const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
+// const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
 
 function getTimeStamp() {
-
-    const now = new Date();
-
-    const pad = (n) =>
-        n.toString().padStart(2, "0");
-
-    return (
-        `${now.getFullYear()}-` +
-        `${pad(now.getMonth() + 1)}-` +
-        `${pad(now.getDate())} ` +
-        `${pad(now.getHours())}:` +
-        `${pad(now.getMinutes())}:` +
-        `${pad(now.getSeconds())}`
-    );
+  const now = new Date();
+  const pad = (n) => n.toString().padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| LOG HEADER
-|--------------------------------------------------------------------------
-*/
-
-function logHeader() {
-
-    console.log(
-        chalk.cyan("=".repeat(lebar))
-    );
-
-    console.log(
-        chalk.cyan(
-            "TIMESTAMP".padEnd(20)
-            +"METHOD".padEnd(7)
-            +"ENDPOINT".padEnd(20)
-            +"STATUS".padEnd(16)
-            // +"MESSAGE"
-        )
-    );
-
-    console.log(
-        chalk.cyan("=".repeat(lebar))
-    );
+function printHeader() {
+    console.log(chalk.cyan("=".repeat(lebar)));
+    console.log(chalk.cyan("TIMESTAMP".padEnd(40)+"METHOD".padEnd(10)+"ENDPOINT".padEnd(30)+"STATUS".padEnd(12)+"MESSAGE"));
+    console.log(chalk.cyan("=".repeat(lebar)));
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| LOG ROW
-|--------------------------------------------------------------------------
-*/
-
-function logRow(
+function formatLog(
     timestamp,
     method,
     endpoint,
     status,
     message,
-    statusColor = "green"
+    widths = { ts: 40, method: 10, endpoint: 30, status: 12 },
+    colors = { ts: "white", method: "yellow", endpoint: "cyan", status: "auto", message: "white" }
 ) {
+    // Fungsi bantu untuk dapatkan warna dari chalk secara dinamis
+    const colorize = (text, color) => {
+        if (color === "auto") {
+            // Otomatis hijau untuk 2xx, merah untuk lainnya
+            const statusNum = Number(status);
+            const statusColor = (statusNum >= 200 && statusNum < 300) ? "green" : "red";
+            return chalk[statusColor](text);
+        }
+        return chalk[color] ? chalk[color](text) : text;
+    };
 
-    const colorStatus =
-        statusColor === "red"
-            ? chalk.red
-            : statusColor === "yellow"
-                ? chalk.yellow
-                : chalk.green;
-
-    console.log(
-        chalk.white(timestamp.padEnd(20))
-         +chalk.white(method.padEnd(7))
-         +chalk.white(endpoint.padEnd(20))
-         +colorStatus(String(status).padEnd(16))
-        //  +chalk.white(message)
+    return (
+        colorize(String(timestamp).padEnd(widths.ts), colors.ts) +
+        colorize(String(method).padEnd(widths.method), colors.method) +
+        colorize(String(endpoint).padEnd(widths.endpoint), colors.endpoint) +
+        colorize(String(status).padEnd(widths.status), colors.status) +
+        colorize(String(message || ""), colors.message)
     );
 }
 
+async function callAPI(endpoint, method = "GET", body = null) {
+    printHeader();
+    const url     = `${BASE_URL}${endpoint}`;
+    const options = {method,headers: { "Content-Type": "application/json" }};
 
-/*
-|--------------------------------------------------------------------------
-| CALL API
-|--------------------------------------------------------------------------
-*/
+    if (body) options.body = JSON.stringify(body);
 
-async function callAPI(
-    endpoint,
-    method = "POST",
-    body = null
-) {
-
-    const url = `${BASE_URL}${endpoint}`;
-
-    const controller = new AbortController();
-
-    const timeout = setTimeout(() => {
-        controller.abort();
-    }, REQUEST_TIMEOUT);
+    try{
+        const response = await fetch(url, options);
+        const text     = await response.text();
 
 
-    const options = {
-        method,
+        // if (!response.ok) {
+        //     const match = text.match(/<strong>Message:<\/strong>\s*([^<]+)/i);
+        //     const errorMsg = match ? match[1].trim() : response.statusText;
 
-        headers: {
-            "Content-Type": "application/json"
-        },
+        //     console.log(
+        //         formatLog(
+        //             getTimeStamp(),
+        //             method,
+        //             endpoint,
+        //             response.status,
+        //             response.statusText,
+        //             { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
+        //             { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
+        //         )
+        //     );
 
-        signal: controller.signal
-    };
-
-
-    if (body !== null) {
-
-        options.body = JSON.stringify(body);
-
-    }
-
-
-    try {
-
-        const response = await fetch(
-            url,
-            options
-        );
-
-        const text = await response.text();
-
-        const timestamp = getTimeStamp();
-
-        logHeader();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | HTTP ERROR
-        |--------------------------------------------------------------------------
-        */
+        //     console.log(chalk.red("*".repeat(lebar)));
+        //     console.log(chalk.red(errorMsg));
+        //     console.log(chalk.red("*".repeat(lebar)));
+            
+        //     return;
+        // }
 
         if (!response.ok) {
 
-            logRow(
-                timestamp,
-                method,
-                endpoint,
-                response.status,
-                `${response.statusText} : ${url}`,
-                "red"
-            );
-
-            return null;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | JSON RESPONSE
-        |--------------------------------------------------------------------------
-        */
-
-        try {
-
-            const data = JSON.parse(text);
-
-            logRow(
-                timestamp,
-                method,
-                endpoint,
-                response.status,
-                `${response.statusText} : ${url}`,
-                "green"
-            );
-
             console.log(
-                chalk.gray(
-                    JSON.stringify(
-                        data,
-                        null,
-                        2
-                    )
+                formatLog(
+                    getTimeStamp(),
+                    method,
+                    endpoint,
+                    response.status,
+                    response.statusText
                 )
             );
 
-            return data;
+            console.log(chalk.red("*".repeat(lebar)));
+            console.log(chalk.red(text)); // tampilkan full response
+            console.log(chalk.red("*".repeat(lebar)));
 
-        } catch {
-
-            /*
-            |--------------------------------------------------------------------------
-            | PLAIN TEXT RESPONSE
-            |--------------------------------------------------------------------------
-            */
-
-            logRow(
-                timestamp,
-                method,
-                endpoint,
-                response.status,
-                response.statusText,
-                "green"
-            );
-
-            console.log(
-                chalk.gray(text)
-            );
-
-            return text;
+            return;
         }
 
+        try{
+            const data = JSON.parse(text);
 
-    } catch (error) {
+            console.log(
+                formatLog(
+                    getTimeStamp(),
+                    method,
+                    endpoint,
+                    response.status,
+                    response.statusText,
+                    { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
+                    { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
+                )
+            );
 
-        logHeader();
+            console.log(data);
+        }catch{
+            const match   = text.match(/<strong>Message:<\/strong>\s*([^<]+)/i);
+            const message = match ? match[1].trim() : text;
 
+            console.log(
+                formatLog(
+                    getTimeStamp(),
+                    method,
+                    endpoint,
+                    response.status,
+                    response.statusText,
+                    { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
+                    { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
+                )
+            );
 
-        /*
-        |--------------------------------------------------------------------------
-        | TIMEOUT
-        |--------------------------------------------------------------------------
-        */
-
-        if (error.name === "AbortError") {
-
-            logRow(
+            console.log(chalk.red(message));
+        }
+    }catch(error){
+        console.log(
+            formatLog(
                 getTimeStamp(),
                 method,
                 endpoint,
-                "TIMEOUT",
-                `Request timeout : ${url}`,
-                "yellow"
-            );
-
-            return null;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | NETWORK ERROR
-        |--------------------------------------------------------------------------
-        */
-
-        logRow(
-            getTimeStamp(),
-            method,
-            endpoint,
-            "NETWORK",
-            `${error.message} : ${url}`,
-            "red"
+                "Network Error",
+                error.message,
+                { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
+                { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
+            )
         );
+    }
+}
 
-        return null;
+async function runservices() {
+    await callAPI("patientid", "POST");
+    await callAPI("poliklinik", "POST");
+    await callAPI("anamnesaawalrj", "POST");
+    await callAPI("orderrad", "POST");
+    await callAPI("orderlab", "POST");
+    await callAPI("specimenlab", "POST");
+    await callAPI("hasillab", "POST");
+    await callAPI("diaglaboratorium", "POST");
+    await callAPI("careplan", "POST");
+    await callAPI("radiologi", "POST");
+    await callAPI("cipoliklinik", "POST");
+    await callAPI("compoliklinik", "POST");
+    await callAPI("singledose", "POST");
+    await callAPI("singledosereq", "POST");
+    await callAPI("igd", "POST");
+    await callAPI("anamnesaawaligd", "POST");
+    await callAPI("psikologisigd", "POST");
+}
 
+async function runservicesSafe() {
+    if (isRunningServices) {
+        return;
+    }
 
+    isRunningServices = true;
+
+    try {
+        await runservices();
+    } catch (e) {
+        console.error("❌ Error runservices:", e.message);
     } finally {
-
-        clearTimeout(timeout);
-
+        isRunningServices = false;
     }
 }
 
-
-/*
-|--------------------------------------------------------------------------
-| RUN ALL SERVICES
-|--------------------------------------------------------------------------
-*/
-
-async function runServices() {
-
-    while (true) {
-
-        for (const endpoint of services) {
-
-            try {
-
-                await callAPI(
-                    endpoint,
-                    "POST"
-                );
-
-            } catch (error) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Jangan sampai satu service menghentikan queue
-                |--------------------------------------------------------------------------
-                */
-
-                logHeader();
-
-                logRow(
-                    getTimeStamp(),
-                    "POST",
-                    endpoint,
-                    "ERROR",
-                    error.message,
-                    "red"
-                );
-
-            }
-
-        }
-
-    }
-
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| START
-|--------------------------------------------------------------------------
-*/
-
-runServices();
+console.clear();
+runservicesSafe();
+setInterval(runservicesSafe, 60 * 60 * 1000);
