@@ -76,11 +76,12 @@
                                 TO_CHAR(A.CREATED_DATE - INTERVAL '7' HOUR,'YYYY-MM-DD')||'T'||TO_CHAR(CREATED_DATE - INTERVAL '7' HOUR,'HH24:MI:SS')||'+00:00' TGLORDER
                             FROM WEB_CO_LAB_DT A
                             WHERE A.SHOW_ITEM='1'
+                            AND   A.CREATED_BY IS NOT NULL
                             AND   A.TEST_ID IN ('LPK122','XELEKT000000010')
                             AND   NOT EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='ServiceRequest' AND JENIS='2' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID AND LAYAN_ID=A.TEST_ID)
                             AND   EXISTS (SELECT 1 FROM SR01_SATUSEHAT_TRANSAKSI WHERE LOKASI_ID='001' AND AKTIF='1' AND RESOURCE_TYPE='Encounter' AND ENVIRONMENT='".$env."' AND PASIEN_ID=A.PASIEN_ID AND EPISODE_ID=A.EPISODE_ID)
                             ORDER BY CREATED_DATE DESC
-                            FETCH FIRST 1 ROWS ONLY
+                            FETCH FIRST 20 ROWS ONLY
                         )X
                     ";
 
