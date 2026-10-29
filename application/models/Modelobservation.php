@@ -23,6 +23,15 @@
                             SELECT A.TRANS_ID, A.PASIEN_ID, A.EPISODE_ID, A.CREATED_BY, A.CREATED_DATE, TV_FREK_NADI, TV_FREK_NAFAS, TV_TEKANAN_DARAH, TV_TEKANAN_DARAH2, TV_SUHU, ANT_BB, ANT_TB, ANT_IMT
                             FROM SR01_MED_ANAMAWAL A
                             WHERE A.AKTIF    = '1'
+                            AND TRUNC(A.CREATED_DATE) >= (
+                                SELECT TRUNC(P.SATUSEHAT_DATE)
+                                FROM SR01_GEN_PASIEN_MS P
+                                WHERE P.LOKASI_ID = '001'
+                                    AND P.AKTIF = '1'
+                                    AND P.ACC_SATUSEHAT = 'Y'
+                                    AND P.SATUSEHAT_ID IS NOT NULL
+                                    AND P.PASIEN_ID = A.PASIEN_ID
+                            )
                             AND EXISTS (
                                 SELECT 1
                                 FROM SR01_GEN_USER_DATA U
@@ -127,6 +136,15 @@
                             JOIN MED_PRWT P
                             ON P.TRANS_ID = A.TRANS_ID
                             WHERE A.AKTIF    = '1'
+                            AND TRUNC(A.CREATED_DATE) >= (
+                                SELECT TRUNC(P.SATUSEHAT_DATE)
+                                FROM SR01_GEN_PASIEN_MS P
+                                WHERE P.LOKASI_ID = '001'
+                                    AND P.AKTIF = '1'
+                                    AND P.ACC_SATUSEHAT = 'Y'
+                                    AND P.SATUSEHAT_ID IS NOT NULL
+                                    AND P.PASIEN_ID = A.PASIEN_ID
+                            )
                             AND EXISTS (
                                 SELECT 1
                                 FROM SR01_GEN_USER_DATA U
@@ -222,6 +240,15 @@
                             FROM SR01_MED_TRIAGE_HD_V2 A
                             WHERE A.AKTIF    = '1'
                             AND A.ISMANUAL = 'E'
+                            AND TRUNC(A.CREATED_DATE) >= (
+                                SELECT TRUNC(P.SATUSEHAT_DATE)
+                                FROM SR01_GEN_PASIEN_MS P
+                                WHERE P.LOKASI_ID = '001'
+                                    AND P.AKTIF = '1'
+                                    AND P.ACC_SATUSEHAT = 'Y'
+                                    AND P.SATUSEHAT_ID IS NOT NULL
+                                    AND P.PASIEN_ID = A.PASIEN_ID
+                            )
                             AND EXISTS (
                                 SELECT 1
                                 FROM SR01_GEN_USER_DATA U
