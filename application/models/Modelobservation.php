@@ -162,8 +162,8 @@
                                     AND T.JENIS = '2'
                                     AND T.RESOURCE_TYPE = 'Encounter'
                                     AND T.ENVIRONMENT = '".$env."'
-                                    AND T.PASIEN_ID = P.PASIEN_ID
-                                    AND T.EPISODE_ID = P.EPISODE_ID
+                                    AND T.PASIEN_ID = Q.PASIEN_ID
+                                    AND T.EPISODE_ID = Q.EPISODE_ID
                             )
                             AND NOT EXISTS (
                                 SELECT 1
@@ -173,8 +173,8 @@
                                     AND T.RESOURCE_TYPE = 'Observation'
                                     AND T.JENIS = '3'
                                     AND T.ENVIRONMENT = '".$env."'
-                                    AND T.PASIEN_ID = P.PASIEN_ID
-                                    AND T.EPISODE_ID = P.EPISODE_ID
+                                    AND T.PASIEN_ID = Q.PASIEN_ID
+                                    AND T.EPISODE_ID = Q.EPISODE_ID
                             )
                         )
                         SELECT A.PASIEN_ID, A.EPISODE_ID, A.TRANS_ID, TINGKAT_GAWAT, CARA_MASUK, BR_FREKUENSI_NAFAS, CIR_TKAN_DARAH, CIR_TKAN_DARAH2, CIR_NADI_TERABA, SUHU_AXILA,
