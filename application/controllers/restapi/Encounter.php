@@ -155,6 +155,7 @@
                             $conditionpostresourcecode['display']           = $display;
                             $conditionpostresourcecode['system']            = "http://hl7.org/fhir/sid/icd-10";
                             $conditionpostresourceidentifier['system']      = "http://sys-ids.kemkes.go.id/condition/".RS_ID;
+                            $conditionpostresourceidentifier['use']         = "official";
                             $conditionpostresourceidentifier['value']       = $episodeid;
 
                             $conditionpostresource['category'][]['coding'][]     = $conditionpostresourcecategory;
@@ -207,6 +208,7 @@
                         $encounterresourceclass['display']                       = "ambulatory";
                         $encounterresourceclass['system']                        = "http://terminology.hl7.org/CodeSystem/v3-ActCode";
                         $encounterresourceidentifier['system']                   = "http://sys-ids.kemkes.go.id/encounter/".RS_ID;
+                        $encounterresourceidentifier['use']                      = "official";
                         $encounterresourceidentifier['value']                    = $episodeid;
                         $encounterresourcelocation['extension'][]                = $encounterresourcelocationextension;
                         $encounterresourcelocation['location']                   = $encounterresourcelocationlocation;

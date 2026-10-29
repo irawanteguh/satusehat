@@ -120,9 +120,10 @@
                             TO_CHAR(S.INPROGRESSEND_DATE - INTERVAL '7' HOUR, 'YYYY-MM-DD') || 'T' || TO_CHAR(S.INPROGRESSEND_DATE - INTERVAL '7' HOUR, 'HH24:MI:SS') || '+00:00' AS INPROGRESSEND,
                             TO_CHAR(GREATEST(A.TGL_KELUAR, NVL(A.LAST_UPDATED_DATE, A.TGL_KELUAR)) - INTERVAL '7' HOUR, 'YYYY-MM-DD') || 'T' || TO_CHAR(GREATEST(A.TGL_KELUAR, NVL(A.LAST_UPDATED_DATE, A.TGL_KELUAR)) - INTERVAL '7' HOUR, 'HH24:MI:SS') || '+00:00' AS FINISH,
 
+                            P.SATUSEHAT_ID AS PATIENTID,
                             P.INT_PASIEN_ID AS PATIENTMR,
                             P.NAMA AS PATIENTNAME,
-                            P.SATUSEHAT_ID AS PATIENTID,
+
                             L.SATUSEHAT_ID AS LOCATIONID,
                             L.NAME AS LOCATIONNAME,
                             U.IHS_ID AS PRACTITIONERID,
@@ -318,9 +319,10 @@
                             TO_CHAR(T.TRIAGE_DATE - INTERVAL '7' HOUR, 'YYYY-MM-DD') || 'T' || TO_CHAR(T.TRIAGE_DATE - INTERVAL '7' HOUR, 'HH24:MI:SS') || '+00:00' AS TRIAGE,
                             TO_CHAR(GREATEST(A.TGL_KELUAR, NVL(A.LAST_UPDATED_DATE, A.TGL_KELUAR)) - INTERVAL '7' HOUR, 'YYYY-MM-DD') || 'T' || TO_CHAR(GREATEST(A.TGL_KELUAR, NVL(A.LAST_UPDATED_DATE, A.TGL_KELUAR)) - INTERVAL '7' HOUR, 'HH24:MI:SS') || '+00:00' AS FINISH,
 
+                            P.SATUSEHAT_ID AS PATIENTID,
                             P.INT_PASIEN_ID AS PATIENTMR,
                             P.NAMA AS PATIENTNAME,
-                            P.SATUSEHAT_ID AS PATIENTID,
+                            
                             L.SATUSEHAT_ID AS LOCATIONID,
                             L.NAME AS LOCATIONNAME,
                             U.IHS_ID AS PRACTITIONERID,

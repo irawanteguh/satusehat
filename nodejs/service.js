@@ -36,7 +36,7 @@ function formatLog( timestamp, method, endpoint, status, message, widths = { ts:
 
     const colorize = (text, color) => {
         if (color === "auto") {
-            const statusNum = Number(status);
+            const statusNum   = Number(status);
             const statusColor = (statusNum >= 200 && statusNum < 300) ? "green" : "red";
             return chalk[statusColor](text);
         }
@@ -117,6 +117,10 @@ async function runservices() {
     await callAPI("patientid", "POST");
     await callAPI("poliklinik", "POST");
     await callAPI("igd", "POST");
+
+
+    //Observation
+    await callAPI("psikologisigd", "POST");
     
     // await callAPI("anamnesaawalrj", "POST");
     // await callAPI("orderrad", "POST");
@@ -132,7 +136,7 @@ async function runservices() {
     // await callAPI("singledosereq", "POST");
     
     // await callAPI("anamnesaawaligd", "POST");
-    // await callAPI("psikologisigd", "POST");
+   
 }
 
 async function runservicesSafe() {

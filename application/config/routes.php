@@ -11,7 +11,7 @@
 
     // $route['anamnesaawalrj']   = 'restapi/Observation/anamnesaawalrj';
     // $route['anamnesaawaligd']  = 'restapi/Observation/anamnesaawaligd';
-    // $route['psikologisigd']  = 'restapi/Observation/psikologisigd';
+    $route['psikologisigd']  = 'restapi/Observation/psikologisigd';
     
     // $route['hasillab']         = 'restapi/Observation/hasillab';
     // $route['orderrad']         = 'restapi/Servicerequest/orderrad';
