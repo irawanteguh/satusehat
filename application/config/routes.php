@@ -9,7 +9,7 @@
     $route['poliklinik'] = 'restapi/Encounter/poliklinik';
     $route['igd']        = 'restapi/Encounter/igd';
 
-    // $route['anamnesaawalrj']   = 'restapi/Observation/anamnesaawalrj';
+    $route['anamnesaawalrj']   = 'restapi/Observation/anamnesaawalrj';
     // $route['anamnesaawaligd']  = 'restapi/Observation/anamnesaawaligd';
     $route['psikologisigd']  = 'restapi/Observation/psikologisigd';
     
