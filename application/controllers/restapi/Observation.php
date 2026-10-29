@@ -627,9 +627,9 @@
 
                         $suratrujukanresource['category'][]['coding'][] = $suratrujukanresourcecategorycoding;
                         $suratrujukanresource['code']['coding'][]       = $suratrujukanresourcecodecoding;
-                        $suratrujukanresource['effectiveDateTime']      = $a->TRIAGE;
+                        $suratrujukanresource['effectiveDateTime']      = $a->PERIODSTART;
                         $suratrujukanresource['encounter']              = $encounter;
-                        $suratrujukanresource['issued']                 = $a->TRIAGE;
+                        $suratrujukanresource['issued']                 = $a->PERIODSTART;
                         $suratrujukanresource['performer'][]            = $performer;
                         $suratrujukanresource['resourceType']           = "Observation";
                         $suratrujukanresource['status']                 = "final";
@@ -652,9 +652,9 @@
                         $ctasMapping = ['UGWT1' => ['LA6113-0', '2'], 'UGWT2' => ['LA6114-8', '3'], 'UGWT3' => ['LA6115-5', '4'], 'UGWT4' => ['LA10137-0', '5']]; [$ctasresourcevalueCodeableConceptcoding['code'], $ctasresourcevalueCodeableConceptcoding['display']] = $ctasMapping[trim(strtoupper($a->TINGKAT_GAWAT))] ?? ['', '']; $ctasresourcevalueCodeableConceptcoding['system'] = "http://loinc.org";
                         $ctasresource['category'][]['coding'][]           = $ctasresourcectasresourcecoding;
                         $ctasresource['code']['coding'][]                 = $ctasresourcecodecoding;
-                        $ctasresource['effectiveDateTime']                = $a->TRIAGE;
+                        $ctasresource['effectiveDateTime']                = $a->PERIODSTART;
                         $ctasresource['encounter']                        = $encounter;
-                        $ctasresource['issued']                           = $a->TRIAGE;
+                        $ctasresource['issued']                           = $a->PERIODSTART;
                         $ctasresource['performer'][]                      = $performer;
                         $ctasresource['resourceType']                     = "Observation";
                         $ctasresource['status']                           = "final";
