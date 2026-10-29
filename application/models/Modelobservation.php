@@ -131,10 +131,10 @@
                         ),
                         BASEDATA AS (
                             SELECT A.TRANS_ID, A.CREATED_BY, A.CREATED_DATE, TINGKAT_GAWAT, CARA_MASUK, BR_FREKUENSI_NAFAS, CIR_TKAN_DARAH, CIR_TKAN_DARAH2, CIR_NADI_TERABA, SUHU_AXILA,
-                                P.PASIEN_ID, P.EPISODE_ID
+                                Q.PASIEN_ID, Q.EPISODE_ID
                             FROM SR01_MED_KAJIUGD A
-                            JOIN MED_PRWT P
-                            ON P.TRANS_ID = A.TRANS_ID
+                            JOIN MED_PRWT Q
+                            ON Q.TRANS_ID = A.TRANS_ID
                             WHERE A.AKTIF    = '1'
                             AND TRUNC(A.CREATED_DATE) >= (
                                 SELECT TRUNC(P.SATUSEHAT_DATE)
@@ -143,7 +143,7 @@
                                     AND P.AKTIF = '1'
                                     AND P.ACC_SATUSEHAT = 'Y'
                                     AND P.SATUSEHAT_ID IS NOT NULL
-                                    AND P.PASIEN_ID = A.PASIEN_ID
+                                    AND P.PASIEN_ID = Q.PASIEN_ID
                             )
                             AND EXISTS (
                                 SELECT 1
