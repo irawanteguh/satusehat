@@ -17,8 +17,8 @@ for (const iface of Object.values(interfaces)) {
     }
 }
 
-const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
-// const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
+// const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
+const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
 
 function getTimeStamp() {
   const now = new Date();
