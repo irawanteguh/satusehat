@@ -336,7 +336,7 @@
                                     $simpanlog['EPISODE_ID']    = $episodeid;
                                     $simpanlog['POLI_ID']       = $poliid;
                                     $simpanlog['DOKTER_ID']     = $dokterid;
-                                    $simpanlog['IDENTIFIER']    = $episodeid;
+                                    $simpanlog['IDENTIFIER']    = $transid;
                                     $simpanlog['LOCATION']      = $entrys['response']['location'];
                                     $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
                                     $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
@@ -371,7 +371,7 @@
                                                 $simpanlog['EPISODE_ID']    = $episodeid;
                                                 $simpanlog['POLI_ID']       = $poliid;
                                                 $simpanlog['DOKTER_ID']     = $dokterid;
-                                                $simpanlog['IDENTIFIER']    = $episodeid;
+                                                $simpanlog['IDENTIFIER']    = $transid;
                                                 $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
                                                 $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
                                                 $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
@@ -379,6 +379,297 @@
                                                 $simpanlog['STATUS']        = "201 Created";
                                                 $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
                                                 $simpanlog['JENIS']         = "1";
+                                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                    
+                                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
+
+                                                if(empty($resultcekdataresouce)){
+                                                    $this->mss->insertdata($simpanlog);
+                                                }
+                                                
+                                                $statusColor = "yellow";
+                                                $statusMsg   = "Duplicate | Observation | Success Save Log Transaction";
+                                                echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    echo color('red')."Data Tidak Ditemukan";
+                }
+            }else{
+                echo color('red').self::$oauth['issue'][0]['details']['text'];
+            }
+        }
+
+        public function anamnesaawaligd_post(){
+            if(!isset(self::$oauth['issue'])){
+
+                $result = $this->md->pengkajianIGD(SERVER);
+
+                if(!empty($result)){
+                    foreach ($result as $a){
+                        $statusColor         = "";
+                        $statusMsg           = "";
+                        $patientid           = "";
+                        $mrpas               = "";
+                        $patientname         = "";
+                        $practitionerid      = "";
+                        $practitionername    = "";
+                        $practitionerradid   = "";
+                        $practitionerradname = "";
+                        $locationid          = "";
+                        $locationname        = "";
+                        $pasienid            = "";
+                        $episodeid           = "";
+                        $poliid              = "";
+                        $dokterid            = "";
+                        $transid             = "";
+
+                        $body           = [];
+                        $categorycoding = [];
+                        $encounter      = [];
+                        $identifier     = [];
+                        $performer      = [];
+                        $subject        = [];
+
+                        $heart                         = [];
+                        $heartresource                 = [];
+                        $heartresourcecodecoding       = [];
+                        $respiratory                   = [];
+                        $respiratoryresource           = [];
+                        $respiratoryresourcecodecoding = [];
+                        $systolic                      = [];
+                        $systolicresource              = [];
+                        $systolicresourcecodecoding    = [];
+                        $diastolic                     = [];
+                        $diastolicresource             = [];
+                        $diastolicresourcecodecoding   = [];
+                        $temp                          = [];
+                        $tempresource                  = [];
+                        $tempresourcecodecoding        = [];
+                        
+
+                        $pasienid  = $a->PASIEN_ID;
+                        $episodeid = $a->EPISODE_ID;
+                        $poliid    = $a->POLI_ID;
+                        $dokterid  = $a->DOKTER_ID;
+                        $transid   = $a->TRANS_ID;
+
+                        if(SERVER === "production"){
+                            $patientid           = $a->PATIENTID;
+                            $mrpas               = $a->PATIENTMR;
+                            $patientname         = $a->PATIENTNAME;
+                            $practitionerid      = $a->PRACTITIONERID;
+                            $practitionername    = $a->PRACTITIONERNAME;
+                            $locationid          = $a->LOCATIONID;
+                            $locationname        = $a->LOCATIONNAME;
+                        }else{
+                            $resultgetRandomPatient      = Satusehat::getRandomPatient();
+                            $resultgetRandomPractitioner = Satusehat::getRandomPractitioner();
+
+                            $patientid           = $resultgetRandomPatient['ihs'];
+                            $mrpas               = "123456";
+                            $patientname         = $resultgetRandomPatient['nama'];
+                            $practitionerid      = $resultgetRandomPractitioner['ihs'];
+                            $practitionername    = $resultgetRandomPractitioner['nama'];
+                            $locationid          = "91b6b664-929e-4b67-802a-a0a86a607a0c";
+                            $locationname        = $a->LOCATIONNAME;
+                        }
+
+                        $categorycoding['code']    = "vital-signs";
+                        $categorycoding['display'] = "Vital Signs";
+                        $categorycoding['system']  = "http://terminology.hl7.org/CodeSystem/observation-category";
+                        $encounter['display']      = "Kunjungan Rawat Jalan Medical Record ".$mrpas.' Atasnama '.$patientname;
+                        $encounter['reference']    = "Encounter/".$a->RESOURCE_ID;
+                        $identifier['system']      = "http://sys-ids.kemkes.go.id/observation/".RS_ID;
+                        $identifier['use']         = "official";
+                        $identifier['value']       = $transid;
+                        $performer['display']      = $practitionername;
+                        $performer['reference']    = "Practitioner/".$practitionerid;
+                        $subject['display']        = $patientname;
+                        $subject['reference']      = "Patient/".$patientid;
+
+                        $heartresourcecodecoding['code']          = "8867-4";
+                        $heartresourcecodecoding['display']       = "Heart rate";
+                        $heartresourcecodecoding['system']        = "http://loinc.org";
+                        $heartresource['category'][]['coding'][]  = $categorycoding;
+                        $heartresource['code']['coding'][]        = $heartresourcecodecoding;
+                        $heartresource['effectiveDateTime']       = $a->PERIODSTART;
+                        $heartresource['encounter']               = $encounter;
+                        $heartresource['identifier'][]            = $identifier;
+                        $heartresource['issued']                  = $a->PERIODSTART;
+                        $heartresource['performer'][]             = $performer;
+                        $heartresource['resourceType']            = "Observation";
+                        $heartresource['status']                  = "final";
+                        $heartresource['subject']                 = $subject;
+                        $heartresource['valueQuantity']['code']   = "/min";
+                        $heartresource['valueQuantity']['system'] = "http://unitsofmeasure.org";
+                        $heartresource['valueQuantity']['unit']   = "breaths/minute";
+                        $heartresource['valueQuantity']['value']  = floatval($a->CIR_NADI_TERABA);
+                        $heart['fullUrl']                         = "urn:uuid:".Satusehat::uuid();
+                        $heart['request']['method']               = "POST";
+                        $heart['request']['url']                  = "Observation";
+                        $heart['resource']                        = $heartresource;
+
+
+                        $respiratoryresourcecodecoding['code']          = "9279-1";
+                        $respiratoryresourcecodecoding['display']       = "Respiratory rate";
+                        $respiratoryresourcecodecoding['system']        = "http://loinc.org";
+                        $respiratoryresource['category'][]['coding'][]  = $categorycoding;
+                        $respiratoryresource['code']['coding'][]        = $respiratoryresourcecodecoding;
+                        $respiratoryresource['effectiveDateTime']       = $a->PERIODSTART;
+                        $respiratoryresource['encounter']               = $encounter;
+                        $respiratoryresource['identifier'][]            = $identifier;
+                        $respiratoryresource['issued']                  = $a->PERIODSTART;
+                        $respiratoryresource['performer'][]             = $performer;
+                        $respiratoryresource['resourceType']            = "Observation";
+                        $respiratoryresource['status']                  = "final";
+                        $respiratoryresource['subject']                 = $subject;
+                        $respiratoryresource['valueQuantity']['code']   = "/min";
+                        $respiratoryresource['valueQuantity']['system'] = "http://unitsofmeasure.org";
+                        $respiratoryresource['valueQuantity']['unit']   = "beats/minute";
+                        $respiratoryresource['valueQuantity']['value']  = floatval($a->BR_FREKUENSI_NAFAS);
+                        $respiratory['fullUrl']                         = "urn:uuid:".Satusehat::uuid();
+                        $respiratory['request']['method']               = "POST";
+                        $respiratory['request']['url']                  = "Observation";
+                        $respiratory['resource']                        = $respiratoryresource;
+
+                        $systolicresourcecodecoding['code']          = "8480-6";
+                        $systolicresourcecodecoding['display']       = "Systolic blood pressure";
+                        $systolicresourcecodecoding['system']        = "http://loinc.org";
+                        $systolicresource['category'][]['coding'][]  = $categorycoding;
+                        $systolicresource['code']['coding'][]        = $systolicresourcecodecoding;
+                        $systolicresource['effectiveDateTime']       = $a->PERIODSTART;
+                        $systolicresource['encounter']               = $encounter;
+                        $systolicresource['identifier'][]            = $identifier;
+                        $systolicresource['issued']                  = $a->PERIODSTART;
+                        $systolicresource['performer'][]             = $performer;
+                        $systolicresource['resourceType']            = "Observation";
+                        $systolicresource['status']                  = "final";
+                        $systolicresource['subject']                 = $subject;
+                        $systolicresource['valueQuantity']['code']   = "mm[Hg]";
+                        $systolicresource['valueQuantity']['system'] = "http://unitsofmeasure.org";
+                        $systolicresource['valueQuantity']['unit']   = "mm[Hg]";
+                        $systolicresource['valueQuantity']['value']  = floatval($a->CIR_TKAN_DARAH);
+                        $systolic['fullUrl']                         = "urn:uuid:".Satusehat::uuid();
+                        $systolic['request']['method']               = "POST";
+                        $systolic['request']['url']                  = "Observation";
+                        $systolic['resource']                        = $systolicresource;
+
+                        $diastolicresourcecodecoding['code']          = "8462-4";
+                        $diastolicresourcecodecoding['display']       = "Diastolic blood pressure";
+                        $diastolicresourcecodecoding['system']        = "http://loinc.org";
+                        $diastolicresource['category'][]['coding'][]  = $categorycoding;
+                        $diastolicresource['code']['coding'][]        = $diastolicresourcecodecoding;
+                        $diastolicresource['effectiveDateTime']       = $a->PERIODSTART;
+                        $diastolicresource['encounter']               = $encounter;
+                        $diastolicresource['identifier'][]            = $identifier;
+                        $diastolicresource['issued']                  = $a->PERIODSTART;
+                        $diastolicresource['performer'][]             = $performer;
+                        $diastolicresource['resourceType']            = "Observation";
+                        $diastolicresource['status']                  = "final";
+                        $diastolicresource['subject']                 = $subject;
+                        $diastolicresource['valueQuantity']['code']   = "mm[Hg]";
+                        $diastolicresource['valueQuantity']['system'] = "http://unitsofmeasure.org";
+                        $diastolicresource['valueQuantity']['unit']   = "mm[Hg]";
+                        $diastolicresource['valueQuantity']['value']  = floatval($a->CIR_TKAN_DARAH2);
+                        $diastolic['fullUrl']                         = "urn:uuid:".Satusehat::uuid();
+                        $diastolic['request']['method']               = "POST";
+                        $diastolic['request']['url']                  = "Observation";
+                        $diastolic['resource']                        = $diastolicresource;
+
+                        $tempresourcecodecoding['code']          = "8310-5";
+                        $tempresourcecodecoding['display']       = "Body temperature";
+                        $tempresourcecodecoding['system']        = "http://loinc.org";
+                        $tempresource['category'][]['coding'][]  = $categorycoding;
+                        $tempresource['code']['coding'][]        = $tempresourcecodecoding;
+                        $tempresource['effectiveDateTime']       = $a->PERIODSTART;
+                        $tempresource['encounter']               = $encounter;
+                        $tempresource['identifier'][]            = $identifier;
+                        $tempresource['issued']                  = $a->PERIODSTART;
+                        $tempresource['performer'][]             = $performer;
+                        $tempresource['resourceType']            = "Observation";
+                        $tempresource['status']                  = "final";
+                        $tempresource['subject']                 = $subject;
+                        $tempresource['valueQuantity']['code']   = "Cel";
+                        $tempresource['valueQuantity']['system'] = "http://unitsofmeasure.org";
+                        $tempresource['valueQuantity']['unit']   = "C";
+                        $tempresource['valueQuantity']['value']  = floatval(str_replace(',', '.', $a->SUHU_AXILA)) >= 100 ? floatval($a->SUHU_AXILA) / 10 : floatval(str_replace(',', '.', $a->SUHU_AXILA));
+                        $temp['fullUrl']                         = "urn:uuid:".Satusehat::uuid();
+                        $temp['request']['method']               = "POST";
+                        $temp['request']['url']                  = "Observation";
+                        $temp['resource']                        = $tempresource;
+
+
+                        $body['resourceType'] = "Bundle";
+                        $body['type']         = "transaction";
+                        if(floatval($a->CIR_NADI_TERABA)!=0){$body['entry'][] = $heart;}
+                        if(floatval($a->BR_FREKUENSI_NAFAS)!=0){$body['entry'][] = $respiratory;}
+                        if(floatval($a->CIR_TKAN_DARAH)!=0){$body['entry'][] = $systolic;}
+                        if(floatval($a->CIR_TKAN_DARAH2)!=0){$body['entry'][] = $diastolic;}
+                        if(floatval($a->SUHU_AXILA)!=0){$body['entry'][] = $temp;}
+
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
+
+                        if($response === null){
+                            echo formatlogbundle($pasienid,$episodeid,"Observation","********", "ERROR | response | NULL response from SATUSEHAT","red");
+                        }else{
+                            if(isset($response['entry'])){
+                                foreach($response['entry'] as $entrys){
+                                    $simpanlog = [];
+
+                                    $simpanlog['PASIEN_ID']     = $pasienid;
+                                    $simpanlog['EPISODE_ID']    = $episodeid;
+                                    $simpanlog['POLI_ID']       = $poliid;
+                                    $simpanlog['DOKTER_ID']     = $dokterid;
+                                    $simpanlog['IDENTIFIER']    = $transid;
+                                    $simpanlog['LOCATION']      = $entrys['response']['location'];
+                                    $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
+                                    $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
+                                    $simpanlog['ETAG']          = $entrys['response']['etag'];
+                                    $simpanlog['STATUS']        = $entrys['response']['status'];
+                                    $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                    $simpanlog['JENIS']         = "3";
+                                    $simpanlog['ENVIRONMENT']   = SERVER;
+                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+        
+                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
+
+                                    if(empty($resultcekdataresouce)){
+                                        $this->mss->insertdata($simpanlog);
+                                    }
+                                    
+                                    $statusColor = "green";
+                                    $statusMsg   = "Success";
+                                    echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
+                                } 
+                            }else{
+                                if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
+                                    if($response['issue'][0]['code']==="duplicate"){
+                                        $responsegetencounter = [];
+                                        $responsegetencounter = Satusehat::getdata("Observation","identifier",$episodeid,$this->oauth['access_token']);
+
+                                        if(isset($responsegetencounter['entry'])){
+                                            foreach($responsegetencounter['entry'] as $responsegetencounters){
+                                                $simpanlog = [];
+
+                                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                                $simpanlog['POLI_ID']       = $poliid;
+                                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                                $simpanlog['IDENTIFIER']    = $transid;
+                                                $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
+                                                $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
+                                                $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
+                                                $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
+                                                $simpanlog['STATUS']        = "201 Created";
+                                                $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
+                                                $simpanlog['JENIS']         = "3";
                                                 $simpanlog['ENVIRONMENT']   = SERVER;
                                                 $simpanlog['CREATED_BY']    = "MIDDLEWARE";
                     
@@ -519,7 +810,7 @@
                                     $simpanlog['EPISODE_ID']    = $episodeid;
                                     $simpanlog['POLI_ID']       = $poliid;
                                     $simpanlog['DOKTER_ID']     = $dokterid;
-                                    $simpanlog['IDENTIFIER']    = $episodeid;
+                                    $simpanlog['IDENTIFIER']    = $transid;
                                     $simpanlog['LOCATION']      = $entrys['response']['location'];
                                     $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
                                     $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
@@ -554,7 +845,7 @@
                                                 $simpanlog['EPISODE_ID']    = $episodeid;
                                                 $simpanlog['POLI_ID']       = $poliid;
                                                 $simpanlog['DOKTER_ID']     = $dokterid;
-                                                $simpanlog['IDENTIFIER']    = $episodeid;
+                                                $simpanlog['IDENTIFIER']    = $transid;
                                                 $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
                                                 $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
                                                 $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];

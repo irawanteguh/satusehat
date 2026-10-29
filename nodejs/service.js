@@ -122,6 +122,7 @@ async function runservices() {
     //Observation
     await callAPI("psikologisigd", "POST");
     await callAPI("anamnesaawalrj", "POST");
+    await callAPI("anamnesaawaligd", "POST");
 
 
     // await callAPI("orderrad", "POST");
