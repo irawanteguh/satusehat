@@ -452,6 +452,18 @@
                         $temp                          = [];
                         $tempresource                  = [];
                         $tempresourcecodecoding        = [];
+
+                        $suratrujukan                       = [];
+                        $suratrujukanresource               = [];
+                        $suratrujukanresourcecategorycoding = [];
+                        $suratrujukanresourcecodecoding     = [];
+
+                        $ctas                                   = [];
+                        $ctasresource                           = [];
+                        $ctasresourcectasresourcecoding         = [];
+                        $ctasresourcecodecoding                 = [];
+                        $ctasresourcevalueCodeableConceptcoding = [];
+                        $ctasMapping                            = [];
                         
 
                         $pasienid  = $a->PASIEN_ID;
@@ -605,9 +617,61 @@
                         $temp['request']['url']                  = "Observation";
                         $temp['resource']                        = $tempresource;
 
+                        $suratrujukanresourcecategorycoding['code']    = "survey";
+                        $suratrujukanresourcecategorycoding['display'] = "Survey";
+                        $suratrujukanresourcecategorycoding['system']  = "http://terminology.hl7.org/CodeSystem/observation-category";
+
+                        $suratrujukanresourcecodecoding['code']    = "OC000034";
+                        $suratrujukanresourcecodecoding['display'] = "Surat Pengantar Rujukan";
+                        $suratrujukanresourcecodecoding['system']  = "http://terminology.kemkes.go.id/CodeSystem/clinical-term";
+
+                        $suratrujukanresource['category'][]['coding'][] = $suratrujukanresourcecategorycoding;
+                        $suratrujukanresource['code']['coding'][]       = $suratrujukanresourcecodecoding;
+                        $suratrujukanresource['effectiveDateTime']      = $a->TRIAGE;
+                        $suratrujukanresource['encounter']              = $encounter;
+                        $suratrujukanresource['issued']                 = $a->TRIAGE;
+                        $suratrujukanresource['performer'][]            = $performer;
+                        $suratrujukanresource['resourceType']           = "Observation";
+                        $suratrujukanresource['status']                 = "final";
+                        $suratrujukanresource['subject']                = $subject;
+                        $suratrujukanresource['identifier'][]           = $identifier;
+                        $suratrujukanresource['valueBoolean']           = ($a->CARA_MASUK == 'UCRMASUK2');
+                        $suratrujukan['fullUrl']                        = "urn:uuid:".Satusehat::uuid();
+                        $suratrujukan['request']['method']              = "POST";
+                        $suratrujukan['request']['url']                 = "Observation";
+                        $suratrujukan['resource']                       = $suratrujukanresource;
+
+                        $ctasresourcectasresourcecoding['code']    = "survey";
+                        $ctasresourcectasresourcecoding['display'] = "Survey";
+                        $ctasresourcectasresourcecoding['system']  = "http://terminology.hl7.org/CodeSystem/observation-category";
+
+                        $ctasresourcecodecoding['code']    = "75910-0";
+                        $ctasresourcecodecoding['display'] = "Canadian triage and acuity scale [CTAS]";
+                        $ctasresourcecodecoding['system']  = "http://loinc.org";
+
+                        $ctasMapping = ['UGWT1' => ['LA6113-0', '2'], 'UGWT2' => ['LA6114-8', '3'], 'UGWT3' => ['LA6115-5', '4'], 'UGWT4' => ['LA10137-0', '5']]; [$ctasresourcevalueCodeableConceptcoding['code'], $ctasresourcevalueCodeableConceptcoding['display']] = $ctasMapping[trim(strtoupper($a->TINGKAT_GAWAT))] ?? ['', '']; $ctasresourcevalueCodeableConceptcoding['system'] = "http://loinc.org";
+                        $ctasresource['category'][]['coding'][]           = $ctasresourcectasresourcecoding;
+                        $ctasresource['code']['coding'][]                 = $ctasresourcecodecoding;
+                        $ctasresource['effectiveDateTime']                = $a->TRIAGE;
+                        $ctasresource['encounter']                        = $encounter;
+                        $ctasresource['issued']                           = $a->TRIAGE;
+                        $ctasresource['performer'][]                      = $performer;
+                        $ctasresource['resourceType']                     = "Observation";
+                        $ctasresource['status']                           = "final";
+                        $ctasresource['subject']                          = $subject;
+                        $ctasresource['identifier'][]                     = $identifier;
+                        $ctasresource['valueCodeableConcept']['coding'][] = $ctasresourcevalueCodeableConceptcoding;
+
+                        $ctas['fullUrl']                        = "urn:uuid:".Satusehat::uuid();
+                        $ctas['request']['method']              = "POST";
+                        $ctas['request']['url']                 = "Observation";
+                        $ctas['resource']                       = $ctasresource;
+
 
                         $body['resourceType'] = "Bundle";
                         $body['type']         = "transaction";
+                        $body['entry'][]      = $suratrujukan;
+                        $body['entry'][]      = $ctas;
                         if(floatval($a->CIR_NADI_TERABA)!=0){$body['entry'][] = $heart;}
                         if(floatval($a->BR_FREKUENSI_NAFAS)!=0){$body['entry'][] = $respiratory;}
                         if(floatval($a->CIR_TKAN_DARAH)!=0){$body['entry'][] = $systolic;}

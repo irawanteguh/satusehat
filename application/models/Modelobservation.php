@@ -275,7 +275,7 @@
                                 WHERE T.LOKASI_ID = '001'
                                     AND T.AKTIF = '1'
                                     AND T.RESOURCE_TYPE = 'Observation'
-                                    AND T.JENIS = '4'
+                                    AND T.JENIS = '3'
                                     AND T.ENVIRONMENT = '".$env."'
                                     AND T.PASIEN_ID = A.PASIEN_ID
                                     AND T.EPISODE_ID = A.EPISODE_ID
