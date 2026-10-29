@@ -33,13 +33,15 @@
     $orgid_dev  = "5767885d-7142-4d38-a2b8-70da28c277f4";
     $orgid_prod = "100026540";
 
-    $env = 'productionkemenkes';
+    $env   = 'developmentkemenkes';
+    $debug = false;
 
     switch ($env) {
 
         //!!!!!! Dinas Kesehatan
         case 'developmentdki':
             define('SERVER',           'development');
+            define('DEBUG',            $debug);
             define('RS_ID',            $orgid_dev);
             define('CLIENT_ID',        $clientid_dev);
             define('CLIENT_SECRET',    $secretid_dev);
@@ -52,6 +54,7 @@
 
         case 'productiondki':
             define('SERVER',           'production');
+            define('DEBUG',            $debug);
             define('RS_ID',            $orgid_prod);
             define('CLIENT_ID',        $clientid_prod);
             define('CLIENT_SECRET',    $secretid_prod);
@@ -65,6 +68,7 @@
         //!!!!!! Kementrian Kesehatan
         case 'developmentkemenkes':
             define('SERVER',          'development');
+            define('DEBUG',            $debug);
             define('RS_ID',            $orgid_dev);
             define('CLIENT_ID',        $clientid_dev);
             define('CLIENT_SECRET',    $secretid_dev);
@@ -77,6 +81,7 @@
 
         case 'productionkemenkes':
             define('SERVER',           'production');
+            define('DEBUG',            $debug);
             define('RS_ID',            $orgid_prod);
             define('CLIENT_ID',        $clientid_prod);
             define('CLIENT_SECRET',    $secretid_prod);

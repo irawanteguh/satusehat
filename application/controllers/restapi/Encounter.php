@@ -3,32 +3,34 @@
     date_default_timezone_set('Asia/Jakarta');
     require_once APPPATH . 'core/MY_Satusehat_Controller.php';
 
-    if(!function_exists('color')){
-        function color($name = null){
-            $colors = [
-                'reset'          => "\033[0m",
-                'black'          => "\033[30m",
-                'red'            => "\033[31m",
-                'green'          => "\033[32m",
-                'yellow'         => "\033[33m",
-                'blue'           => "\033[34m",
-                'magenta'        => "\033[35m",
-                'cyan'           => "\033[36m",
-                'white'          => "\033[37m",
-                'gray'           => "\033[90m",
-                'light_red'      => "\033[91m",
-                'light_green'    => "\033[92m",
-                'light_yellow'   => "\033[93m",
-                'light_blue'     => "\033[94m",
-                'light_magenta'  => "\033[95m",
-                'light_cyan'     => "\033[96m",
-                'light_white'    => "\033[97m",
-            ];
+    if(DEBUG === false){
+        if(!function_exists('color')){
+            function color($name = null){
+                $colors = [
+                    'reset'          => "\033[0m",
+                    'black'          => "\033[30m",
+                    'red'            => "\033[31m",
+                    'green'          => "\033[32m",
+                    'yellow'         => "\033[33m",
+                    'blue'           => "\033[34m",
+                    'magenta'        => "\033[35m",
+                    'cyan'           => "\033[36m",
+                    'white'          => "\033[37m",
+                    'gray'           => "\033[90m",
+                    'light_red'      => "\033[91m",
+                    'light_green'    => "\033[92m",
+                    'light_yellow'   => "\033[93m",
+                    'light_blue'     => "\033[94m",
+                    'light_magenta'  => "\033[95m",
+                    'light_cyan'     => "\033[96m",
+                    'light_white'    => "\033[97m",
+                ];
 
-            return $colors[$name] ?? $colors['reset'];
+                return $colors[$name] ?? $colors['reset'];
+            }
         }
     }
-
+    
     class Encounter extends MY_Satusehat_Controller{
 
         public function __construct(){
@@ -38,11 +40,12 @@
         
         public function poliklinik_post(){
             if(!isset(self::$oauth['issue'])){
+
                 $result = $this->md->poliklinik(SERVER);
+
                 if(!empty($result)){
                     foreach ($result as $a){
-                        $statusColor      = "";
-                        $statusMsg        = "";
+                        $uuidencounter    = "";
                         $patientid        = "";
                         $mrpas            = "";
                         $patientname      = "";
@@ -54,25 +57,31 @@
                         $episodeid        = "";
                         $poliid           = "";
                         $dokterid         = "";
-                        $uuidencounter    = "";
 
+                        $response                                           = [];
+                        $body                                               = [];
+                        $encounter                                          = [];
+                        $encounterresource                                  = [];
+                        $encounterresourceclass                             = [];
+                        $encounterresourceidentifier                        = [];
+                        $encounterresourcelocation                          = [];
+                        $encounterresourcelocationextension                 = [];
+                        $encounterresourcelocationextensionextension        = [];
+                        $encounterresourcelocationextensionextension1       = [];
+                        $encounterresourcelocationextensionextension2       = [];
+                        $encounterresourcelocationextensionextension1coding = [];
+                        $encounterresourcelocationextensionextension2coding = [];
+                        $encounterresourcelocationlocation                  = [];
+                        $encounterresourcelocationperiod                    = [];
+                        $encounterresourceparticipant                       = [];
+                        $encounterresourceparticipanttypecoding             = [];
+                        $statusHistoryperiodstart                           = [];
+                        $statusHistoryinprogress                            = [];
+                        $statusHistoryfinish                                = [];
 
-                        $body                     = [];
-                        $encounter                = [];
-                        $resource                 = [];
-                        $diagnosis                = [];
-                        $conditions               = [];
-                        $resourceidentifier       = [];
-                        $resourcelocation         = [];
-                        $resourceparticipant      = [];
-                        $resourceparticipanttype  = [];
-                        $statusHistoryfinish      = [];
-                        $statusHistoryinprogress  = [];
-                        $statusHistorytriage      = [];
-                        $statusHistoryperiodstart = [];
-                        $statusHistoryplanned     = [];
-                        $conditiondiag            = [];
-                        $resultcekdataresouce     = [];
+                        $conditions    = [];
+                        $diagnosis     = [];
+                        $conditiondiag = [];
 
                         $uuidencounter = Satusehat::uuid();
 
@@ -101,14 +110,13 @@
                             $locationname                = $a->LOCATIONNAME;
                         }
 
-                        ////////////////////////////////
-
                         $conditions = explode('|', $a->CONDITION);
-                        $seq = 1;
+                        $seq        = 1;
                         foreach($conditions as $condition){
-                            $uuidcondition                       = "";
-                            $refcondition                        = [];
-                            $refconditioncoding                  = [];
+
+                            $refcondition       = [];
+                            $refconditioncoding = [];
+
                             $conditionpost                       = [];
                             $conditionpostresource               = [];
                             $conditionpostresourcecategory       = [];
@@ -120,11 +128,14 @@
                             $parts         = explode(';', $condition, 2);
                             $code          = trim($parts[0]);
                             $display       = trim($parts[1]);
+
+                            $uuidcondition = "";
                             $uuidcondition = Satusehat::uuid();
 
                             $refconditioncoding['code']    = "DD";
                             $refconditioncoding['display'] = "Discharge diagnosis";
                             $refconditioncoding['system']  = "http://terminology.hl7.org/CodeSystem/diagnosis-role";
+
 
                             $refcondition['condition']['display']   = $display;
                             $refcondition['condition']['reference'] = "urn:uuid:".$uuidcondition;
@@ -153,6 +164,8 @@
                             $conditionpostresource['identifier'][]               = $conditionpostresourceidentifier;
                             $conditionpostresource['onsetDateTime']              = $a->INPROGRESSEND;
                             $conditionpostresource['recordedDate']               = $a->INPROGRESSEND;
+                            $conditionpostresource['recorder']['display']        = $practitionername;
+                            $conditionpostresource['recorder']['reference']      = "Practitioner/".$practitionerid;
                             $conditionpostresource['resourceType']               = "Condition";
                             $conditionpostresource['subject']['display']         = $patientname;
                             $conditionpostresource['subject']['reference']       = "Patient/".$patientid;
@@ -165,49 +178,70 @@
                             $conditiondiag[]   = $conditionpost;
                         }
 
-                        $resourceparticipanttype['code']    = "ATND";
-                        $resourceparticipanttype['display'] = "attender";
-                        $resourceparticipanttype['system']  = "http://terminology.hl7.org/CodeSystem/v3-ParticipationType";
+                        $encounterresourcelocationextensionextension1coding['code']    = "reguler";
+                        $encounterresourcelocationextensionextension1coding['display'] = "Kelas Reguler";
+                        $encounterresourcelocationextensionextension1coding['system']  = "http://terminology.kemkes.go.id/CodeSystem/locationServiceClass-Outpatient";
+                        $encounterresourcelocationextensionextension2coding['code']    = "kelas-tetap";
+                        $encounterresourcelocationextensionextension2coding['display'] = "Kelas Tetap Perawatan";
+                        $encounterresourcelocationextensionextension2coding['system']  = "http://terminology.kemkes.go.id/CodeSystem/locationUpgradeClass";
 
-                        $resourceidentifier['system']                   = "http://sys-ids.kemkes.go.id/encounter/".RS_ID;
-                        $resourceidentifier['value']                    = $episodeid;
-                        $resourcelocation['location']['display']        = $locationname;
-                        $resourcelocation['location']['reference']      = "Location/".$locationid;
-                        $resourcelocation['period']['end']              = $a->FINISH;
-                        $resourcelocation['period']['start']            = $a->PERIODSTART;
-                        $resourceparticipant['individual']['display']   = $practitionername;
-                        $resourceparticipant['individual']['reference'] = "Practitioner/".$practitionerid;
-                        $resourceparticipant['type'][]['coding'][]      = $resourceparticipanttype;
+                        $encounterresourcelocationextensionextension1['url']                              = "value";
+                        $encounterresourcelocationextensionextension1['valueCodeableConcept']['coding'][] = $encounterresourcelocationextensionextension1coding;
+                        $encounterresourcelocationextensionextension2['url']                              = "upgradeClassIndicator";
+                        $encounterresourcelocationextensionextension2['valueCodeableConcept']['coding'][] = $encounterresourcelocationextensionextension2coding;
                         
-                        $resource['class']['code']                = "AMB";
-                        $resource['class']['display']             = "ambulatory";
-                        $resource['class']['system']              = "http://terminology.hl7.org/CodeSystem/v3-ActCode";
-                        $resource['diagnosis']                    = $diagnosis;
-                        $resource['identifier'][]                 = $resourceidentifier;
-                        $resource['location'][]                   = $resourcelocation;
-                        $resource['participant'][]                = $resourceparticipant;
-                        $resource['period']['end']                = $a->FINISH;
-                        $resource['period']['start']              = $a->PERIODSTART;
-                        $resource['resourceType']                 = "Encounter";
-                        $resource['serviceProvider']['reference'] = "Organization/".RS_ID;
-                        $resource['status']                       = "finished";
+                        $encounterresourcelocationextensionextension[]=$encounterresourcelocationextensionextension1;
+                        $encounterresourcelocationextensionextension[]=$encounterresourcelocationextensionextension2;
+
+                        $encounterresourcelocationextension['extension']   = $encounterresourcelocationextensionextension;
+                        $encounterresourcelocationextension['url']         = "https://fhir.kemkes.go.id/r4/StructureDefinition/ServiceClass";
+                        $encounterresourcelocationlocation['display']      = $locationname;
+                        $encounterresourcelocationlocation['reference']    = "Location/".$locationid;
+                        $encounterresourcelocationperiod['end']            = $a->FINISH;
+                        $encounterresourcelocationperiod['start']          = $a->PERIODSTART;
+                        $encounterresourceparticipanttypecoding['code']    = "ATND";
+                        $encounterresourceparticipanttypecoding['display'] = "attender";
+                        $encounterresourceparticipanttypecoding['system']  = "http://terminology.hl7.org/CodeSystem/v3-ParticipationType";
+
+                        $encounterresourceclass['code']                          = "AMB";
+                        $encounterresourceclass['display']                       = "ambulatory";
+                        $encounterresourceclass['system']                        = "http://terminology.hl7.org/CodeSystem/v3-ActCode";
+                        $encounterresourceidentifier['system']                   = "http://sys-ids.kemkes.go.id/encounter/".RS_ID;
+                        $encounterresourceidentifier['value']                    = $episodeid;
+                        $encounterresourcelocation['extension'][]                = $encounterresourcelocationextension;
+                        $encounterresourcelocation['location']                   = $encounterresourcelocationlocation;
+                        $encounterresourcelocation['period']                     = $encounterresourcelocationperiod;
+                        $encounterresourceparticipant['individual']['display']   = $practitionername;
+                        $encounterresourceparticipant['individual']['reference'] = "Practitioner/".$practitionerid;
+                        $encounterresourceparticipant['type'][]['coding'][]      = $encounterresourceparticipanttypecoding;
+
+                        $encounterresource['class']                        = $encounterresourceclass;
+                        $encounterresource['diagnosis']                    = $diagnosis;
+                        $encounterresource['identifier'][]                 = $encounterresourceidentifier;
+                        $encounterresource['location'][]                   = $encounterresourcelocation;
+                        $encounterresource['participant'][]                = $encounterresourceparticipant;
+                        $encounterresource['period']['end']                = $a->FINISH;
+                        $encounterresource['period']['start']              = $a->PERIODSTART;
+                        $encounterresource['resourceType']                 = "Encounter";
+                        $encounterresource['serviceProvider']['reference'] = "Organization/".RS_ID;
+                        $encounterresource['status']                       = "finished";
                         if($a->PLANNED!=null){
                             $statusHistoryplanned['period']['start'] = $a->PLANNED;
                             $statusHistoryplanned['period']['end']   = $a->PLANNED;
                             $statusHistoryplanned['status']          = "planned";
-                            $resource['statusHistory'][]             = $statusHistoryplanned;
+                            $encounterresource['statusHistory'][]    = $statusHistoryplanned;
                         }
                         if($a->PERIODSTART!=null){
                             $statusHistoryperiodstart['period']['start'] = $a->PERIODSTART;
                             $statusHistoryperiodstart['period']['end']   = $a->PERIODSTART;
                             $statusHistoryperiodstart['status']          = "arrived";
-                            $resource['statusHistory'][]                 = $statusHistoryperiodstart;
+                            $encounterresource['statusHistory'][]        = $statusHistoryperiodstart;
                         }
                         if($a->TRIAGE!=null){
                             $statusHistorytriage['period']['start'] = $a->TRIAGE;
                             $statusHistorytriage['period']['end']   = $a->TRIAGE;
                             $statusHistorytriage['status']          = "triaged";
-                            $resource['statusHistory'][]            = $statusHistorytriage;
+                            $encounterresource['statusHistory'][]   = $statusHistorytriage;
                         }
                         if($a->INPROGRESSSTART!=null && $a->INPROGRESSEND!=null){
                             $statusHistoryinprogress['period']['start'] = $a->INPROGRESSSTART;
@@ -216,23 +250,23 @@
                             } else {
                                 $statusHistoryinprogress['period']['end'] = $a->INPROGRESSEND;
                             }
-                            $statusHistoryinprogress['status']          = "in-progress";
-                            $resource['statusHistory'][]                = $statusHistoryinprogress;
+                            $statusHistoryinprogress['status']    = "in-progress";
+                            $encounterresource['statusHistory'][] = $statusHistoryinprogress;
                         }
                         if($a->FINISH!=null){
                             $statusHistoryfinish['period']['start'] = $a->FINISH;
                             $statusHistoryfinish['period']['end']   = $a->FINISH;
                             $statusHistoryfinish['status']          = "finished";
-                            $resource['statusHistory'][]            = $statusHistoryfinish;
+                            $encounterresource['statusHistory'][]   = $statusHistoryfinish;
                         }
-                        $resource['subject']['display']   = $patientname;
-                        $resource['subject']['reference'] = "Patient/".$patientid;
+                        $encounterresource['subject']['display']   = $patientname;
+                        $encounterresource['subject']['reference'] = "Patient/".$patientid;
 
                         $encounter['fullUrl']           = "urn:uuid:".$uuidencounter;
                         $encounter['request']['method'] = "POST";
                         $encounter['request']['url']    = "Encounter";
-                        $encounter['resource']          = $resource;
-
+                        $encounter['resource']          = $encounterresource;
+                        
                         $body['resourceType'] = "Bundle";
                         $body['type']         = "transaction";
                         $body['entry'][]      = $encounter;
@@ -240,153 +274,111 @@
 
                         $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
-                        if(isset($response['entry'])){
-                            foreach($response['entry'] as $entrys){
-                                $simpanlog = [];
-
-                                $simpanlog['PASIEN_ID']     = $pasienid;
-                                $simpanlog['EPISODE_ID']    = $episodeid;
-                                $simpanlog['POLI_ID']       = $poliid;
-                                $simpanlog['DOKTER_ID']     = $dokterid;
-                                $simpanlog['IDENTIFIER']    = $episodeid;
-                                $simpanlog['LOCATION']      = $entrys['response']['location'];
-                                $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
-                                $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
-                                $simpanlog['ETAG']          = $entrys['response']['etag'];
-                                $simpanlog['STATUS']        = $entrys['response']['status'];
-                                $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
-                                $simpanlog['JENIS']         = "1";
-                                $simpanlog['ENVIRONMENT']   = SERVER;
-                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-    
-                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
-
-                                if(empty($resultcekdataresouce)){
-                                    $this->mss->insertdata($simpanlog);
-                                }
-                                
-
-                                $statusColor = "green";
-                                $statusMsg   = "Success";
-                                echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
-                            } 
+                        if($response === null){
+                            echo formatlogbundle($pasienid,$episodeid,"Encounter","********", "ERROR | response | NULL response from SATUSEHAT","red");
                         }else{
-                            if($response === null){
-                                $statusColor = "red";
-                                echo formatlogbundle($pasienid,$episodeid,'Encounter','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
-                            }else{
-                                if(isset($response['fault'])){
-                                    $faultString = $response['fault']['faultstring'] ?? 'Unknown fault';
-                                    $errorCode   = $response['fault']['detail']['errorcode'] ?? 'unknown';
-                                    $statusColor = 'red';
-                                    $statusMsg   = 'FAULT | ' . $errorCode . ' | ' . $faultString;
+                            if(isset($response['entry'])){
+                                foreach($response['entry'] as $entrys){
+                                    $simpanlog = [];
 
-                                    echo formatlogbundle($pasienid,$episodeid,'Encounter','',$statusMsg,$statusColor);
-                                }else{
-                                    if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
-                                        
-                                        foreach ($response['issue'] as $issues) {
-                                            if($issues['code']!="duplicate"){
-                                                $statusColor = "";
-                                                $severity    = $issues['severity'] ?? 'unknown';
-                                                $code        = $issues['code'] ?? '-';
-                                                $text        = $issues['details']['text'] ?? '-';
-                                                $diagnostics = $issues['diagnostics'] ?? $text;
-                                                $expression  = $issues['expression'][0] ?? '-';
+                                    $simpanlog['PASIEN_ID']     = $pasienid;
+                                    $simpanlog['EPISODE_ID']    = $episodeid;
+                                    $simpanlog['POLI_ID']       = $poliid;
+                                    $simpanlog['DOKTER_ID']     = $dokterid;
+                                    $simpanlog['IDENTIFIER']    = $episodeid;
+                                    $simpanlog['LOCATION']      = $entrys['response']['location'];
+                                    $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
+                                    $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
+                                    $simpanlog['ETAG']          = $entrys['response']['etag'];
+                                    $simpanlog['STATUS']        = $entrys['response']['status'];
+                                    $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                    $simpanlog['JENIS']         = "1";
+                                    $simpanlog['ENVIRONMENT']   = SERVER;
+                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+        
+                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
 
-                                                switch ($severity) {
-                                                    case 'error':
-                                                        $statusColor = 'red';
-                                                        break;
-                                                    case 'warning':
-                                                        $statusColor = 'yellow';
-                                                        break;
-                                                    default:
-                                                        $statusColor = 'white';
-                                                }
-
-                                                $statusMsg = $expression;
-                                                echo formatlogbundle($pasienid,$episodeid,'Encounter','',$statusMsg,$statusColor);
-                                            }
-                                            
-                                        }
+                                    if(empty($resultcekdataresouce)){
+                                        $this->mss->insertdata($simpanlog);
                                     }
+                                    
+                                    $statusColor = "green";
+                                    $statusMsg   = "Success";
+                                    echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
+                                } 
+                            }else{
+                                if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
+                                    if($response['issue'][0]['code']==="duplicate"){
+                                        $responsegetencounter = [];
+                                        $responsegetencounter = Satusehat::getdata("Encounter","identifier",$episodeid,$this->oauth['access_token']);
 
-                                    if(isset($response['issue'])){
-                                        if($response['issue'][0]['code']==="duplicate"){
-                                            $responsegetencounter          = [];
-                                            $responsegetcondition          = [];
-                                            $responsegetconditionencounter = [];
+                                        if(isset($responsegetencounter['entry'])){
+                                            foreach($responsegetencounter['entry'] as $responsegetencounters){
+                                                $simpanlog = [];
 
-                                            $responsegetencounter = Satusehat::getdata("Encounter","identifier",$episodeid,$this->oauth['access_token']);
-                                            $responsegetcondition = Satusehat::getdata("Condition","identifier",$episodeid,$this->oauth['access_token']); 
+                                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                                $simpanlog['POLI_ID']       = $poliid;
+                                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                                $simpanlog['IDENTIFIER']    = $episodeid;
+                                                $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
+                                                $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
+                                                $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
+                                                $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
+                                                $simpanlog['STATUS']        = "201 Created";
+                                                $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
+                                                $simpanlog['JENIS']         = "1";
+                                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                    
+                                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
 
-                                            if(isset($responsegetencounter['entry'])){
-                                                foreach($responsegetencounter['entry'] as $responsegetencounters){
-                                                    $simpanlog=[];
-
-                                                    $simpanlog['PASIEN_ID']     = $pasienid;
-                                                    $simpanlog['EPISODE_ID']    = $episodeid;
-                                                    $simpanlog['POLI_ID']       = $poliid;
-                                                    $simpanlog['DOKTER_ID']     = $dokterid;
-                                                    $simpanlog['IDENTIFIER']    = $episodeid;
-                                                    $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
-                                                    $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
-                                                    $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
-                                                    $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
-                                                    $simpanlog['STATUS']        = "201 Created";
-                                                    $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
-                                                    $simpanlog['JENIS']         = "1";
-                                                    $simpanlog['ENVIRONMENT']   = SERVER;
-                                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                                    
-                                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
-
-                                                    if(empty($resultcekdataresouce)){
-                                                        $this->mss->insertdata($simpanlog);
-                                                    }
-
-                                                    $statusColor = "yellow";
-                                                    $statusMsg   = "GET ENCOUNTER BY EPISODE ID";
-                                                    echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
+                                                if(empty($resultcekdataresouce)){
+                                                    $this->mss->insertdata($simpanlog);
                                                 }
-                                            }
-
-                                            if(isset($responsegetcondition['entry'])){
-                                                foreach($responsegetcondition['entry'] as $responsegetconditions){
-                                                    $simpanlog=[];
-
-                                                    $simpanlog['PASIEN_ID']     = $pasienid;
-                                                    $simpanlog['EPISODE_ID']    = $episodeid;
-                                                    $simpanlog['POLI_ID']       = $poliid;
-                                                    $simpanlog['DOKTER_ID']     = $dokterid;
-                                                    $simpanlog['IDENTIFIER']    = $episodeid;
-                                                    $simpanlog['LOCATION']      = $responsegetconditions['fullUrl']."/_history/".trim($responsegetconditions['resource']['meta']['versionId'], 'W/"');
-                                                    $simpanlog['RESOURCE_TYPE'] = $responsegetconditions['resource']['resourceType'];
-                                                    $simpanlog['RESOURCE_ID']   = $responsegetconditions['resource']['id'];
-                                                    $simpanlog['ETAG']          = 'W/"' . $responsegetconditions['resource']['meta']['versionId'] . '"';
-                                                    $simpanlog['STATUS']        = "201 Created";
-                                                    $simpanlog['LAST_MODIFIED'] = $responsegetconditions['resource']['meta']['lastUpdated'];
-                                                    $simpanlog['JENIS']         = "1";
-                                                    $simpanlog['ENVIRONMENT']   = SERVER;
-                                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                                    
-                                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id']);
-
-                                                    if(empty($resultcekdataresouce)){
-                                                        $this->mss->insertdata($simpanlog);
-                                                    }
-
-                                                    $statusColor = "yellow";
-                                                    $statusMsg   = "GET CONDITION BY EPISODE ID";
-                                                    echo formatlogbundle($pasienid,$episodeid,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id'], $statusMsg,$statusColor);
-                                                }
+                                                
+                                                $statusColor = "yellow";
+                                                $statusMsg   = "Duplicate | Encounter | Success Save Log Transaction";
+                                                echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
                                             }
                                         }
+
+                                        $responsegetcondition = [];
+                                        $responsegetcondition = Satusehat::getdata("Condition","identifier",$episodeid,$this->oauth['access_token']);
+
+                                        if(isset($responsegetcondition['entry'])){
+                                            foreach($responsegetcondition['entry'] as $responsegetconditions){
+                                                $simpanlog = [];
+
+                                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                                $simpanlog['POLI_ID']       = $poliid;
+                                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                                $simpanlog['IDENTIFIER']    = $episodeid;
+                                                $simpanlog['LOCATION']      = $responsegetconditions['fullUrl']."/_history/".trim($responsegetconditions['resource']['meta']['versionId'], 'W/"');
+                                                $simpanlog['RESOURCE_TYPE'] = $responsegetconditions['resource']['resourceType'];
+                                                $simpanlog['RESOURCE_ID']   = $responsegetconditions['resource']['id'];
+                                                $simpanlog['ETAG']          = 'W/"' . $responsegetconditions['resource']['meta']['versionId'] . '"';
+                                                $simpanlog['STATUS']        = "201 Created";
+                                                $simpanlog['LAST_MODIFIED'] = $responsegetconditions['resource']['meta']['lastUpdated'];
+                                                $simpanlog['JENIS']         = "1";
+                                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                    
+                                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id']);
+
+                                                if(empty($resultcekdataresouce)){
+                                                    $this->mss->insertdata($simpanlog);
+                                                }
+                                                
+                                                $statusColor = "yellow";
+                                                $statusMsg   = "Duplicate | Condition | Success Save Log Transaction";
+                                                echo formatlogbundle($pasienid,$episodeid,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id'], $statusMsg,$statusColor);
+                                            }
+                                        }
+
                                     }
                                 }
-
-                                
                             }
                         }
                     }
@@ -400,11 +392,12 @@
 
         public function igd_post(){
             if(!isset(self::$oauth['issue'])){
+
                 $result = $this->md->igd(SERVER);
+
                 if(!empty($result)){
                     foreach ($result as $a){
-                        $statusColor      = "";
-                        $statusMsg        = "";
+                        $uuidencounter    = "";
                         $patientid        = "";
                         $mrpas            = "";
                         $patientname      = "";
@@ -416,25 +409,31 @@
                         $episodeid        = "";
                         $poliid           = "";
                         $dokterid         = "";
-                        $uuidencounter    = "";
 
+                        $response                                           = [];
+                        $body                                               = [];
+                        $encounter                                          = [];
+                        $encounterresource                                  = [];
+                        $encounterresourceclass                             = [];
+                        $encounterresourceidentifier                        = [];
+                        $encounterresourcelocation                          = [];
+                        $encounterresourcelocationextension                 = [];
+                        $encounterresourcelocationextensionextension        = [];
+                        $encounterresourcelocationextensionextension1       = [];
+                        $encounterresourcelocationextensionextension2       = [];
+                        $encounterresourcelocationextensionextension1coding = [];
+                        $encounterresourcelocationextensionextension2coding = [];
+                        $encounterresourcelocationlocation                  = [];
+                        $encounterresourcelocationperiod                    = [];
+                        $encounterresourceparticipant                       = [];
+                        $encounterresourceparticipanttypecoding             = [];
+                        $statusHistoryperiodstart                           = [];
+                        $statusHistoryinprogress                            = [];
+                        $statusHistoryfinish                                = [];
 
-                        $body                     = [];
-                        $encounter                = [];
-                        $resource                 = [];
-                        $diagnosis                = [];
-                        $conditions               = [];
-                        $resourceidentifier       = [];
-                        $resourcelocation         = [];
-                        $resourceparticipant      = [];
-                        $resourceparticipanttype  = [];
-                        $statusHistoryfinish      = [];
-                        $statusHistoryinprogress  = [];
-                        $statusHistorytriage      = [];
-                        $statusHistoryperiodstart = [];
-                        $statusHistoryplanned     = [];
-                        $conditiondiag            = [];
-                        $resultcekdataresouce     = [];
+                        $conditions    = [];
+                        $diagnosis     = [];
+                        $conditiondiag = [];
 
                         $uuidencounter = Satusehat::uuid();
 
@@ -463,14 +462,13 @@
                             $locationname                = $a->LOCATIONNAME;
                         }
 
-                        ////////////////////////////////
-
                         $conditions = explode('|', $a->CONDITION);
-                        $seq = 1;
+                        $seq        = 1;
                         foreach($conditions as $condition){
-                            $uuidcondition                       = "";
-                            $refcondition                        = [];
-                            $refconditioncoding                  = [];
+
+                            $refcondition       = [];
+                            $refconditioncoding = [];
+
                             $conditionpost                       = [];
                             $conditionpostresource               = [];
                             $conditionpostresourcecategory       = [];
@@ -482,11 +480,14 @@
                             $parts         = explode(';', $condition, 2);
                             $code          = trim($parts[0]);
                             $display       = trim($parts[1]);
+
+                            $uuidcondition = "";
                             $uuidcondition = Satusehat::uuid();
 
                             $refconditioncoding['code']    = "DD";
                             $refconditioncoding['display'] = "Discharge diagnosis";
                             $refconditioncoding['system']  = "http://terminology.hl7.org/CodeSystem/diagnosis-role";
+
 
                             $refcondition['condition']['display']   = $display;
                             $refcondition['condition']['reference'] = "urn:uuid:".$uuidcondition;
@@ -513,6 +514,8 @@
                             $conditionpostresource['code']['coding'][]           = $conditionpostresourcecode;
                             $conditionpostresource['encounter']['reference']     = "urn:uuid:".$uuidencounter;
                             $conditionpostresource['identifier'][]               = $conditionpostresourceidentifier;
+                            $conditionpostresource['recorder']['display']        = $practitionername;
+                            $conditionpostresource['recorder']['reference']      = "Practitioner/".$practitionerid;
                             $conditionpostresource['resourceType']               = "Condition";
                             $conditionpostresource['subject']['display']         = $patientname;
                             $conditionpostresource['subject']['reference']       = "Patient/".$patientid;
@@ -525,52 +528,79 @@
                             $conditiondiag[]   = $conditionpost;
                         }
 
-                        $resourceparticipanttype['code']    = "ATND";
-                        $resourceparticipanttype['display'] = "attender";
-                        $resourceparticipanttype['system']  = "http://terminology.hl7.org/CodeSystem/v3-ParticipationType";
+                        $encounterresourcelocationextensionextension1coding['code']    = "reguler";
+                        $encounterresourcelocationextensionextension1coding['display'] = "Kelas Reguler";
+                        $encounterresourcelocationextensionextension1coding['system']  = "http://terminology.kemkes.go.id/CodeSystem/locationServiceClass-Outpatient";
+                        $encounterresourcelocationextensionextension2coding['code']    = "kelas-tetap";
+                        $encounterresourcelocationextensionextension2coding['display'] = "Kelas Tetap Perawatan";
+                        $encounterresourcelocationextensionextension2coding['system']  = "http://terminology.kemkes.go.id/CodeSystem/locationUpgradeClass";
 
-                        $resourceidentifier['system']                   = "http://sys-ids.kemkes.go.id/encounter/".RS_ID;
-                        $resourceidentifier['value']                    = $episodeid;
-                        $resourcelocation['location']['display']        = $locationname;
-                        $resourcelocation['location']['reference']      = "Location/".$locationid;
-                        $resourcelocation['period']['end']              = $a->FINISH;
-                        $resourcelocation['period']['start']            = $a->PERIODSTART;
-                        $resourceparticipant['individual']['display']   = $practitionername;
-                        $resourceparticipant['individual']['reference'] = "Practitioner/".$practitionerid;
-                        $resourceparticipant['type'][]['coding'][]      = $resourceparticipanttype;
+                        $encounterresourcelocationextensionextension1['url']                              = "value";
+                        $encounterresourcelocationextensionextension1['valueCodeableConcept']['coding'][] = $encounterresourcelocationextensionextension1coding;
+                        $encounterresourcelocationextensionextension2['url']                              = "upgradeClassIndicator";
+                        $encounterresourcelocationextensionextension2['valueCodeableConcept']['coding'][] = $encounterresourcelocationextensionextension2coding;
                         
-                        $resource['class']['code']                = "EMER";
-                        $resource['class']['display']             = "emergency";
-                        $resource['class']['system']              = "http://terminology.hl7.org/CodeSystem/v3-ActCode";
-                        $resource['diagnosis']                    = $diagnosis;
-                        $resource['identifier'][]                 = $resourceidentifier;
-                        $resource['location'][]                   = $resourcelocation;
-                        $resource['participant'][]                = $resourceparticipant;
-                        $resource['period']['end']                = $a->FINISH;
-                        $resource['period']['start']              = $a->PERIODSTART;
-                        $resource['resourceType']                 = "Encounter";
-                        $resource['serviceProvider']['reference'] = "Organization/".RS_ID;
-                        $resource['status']                       = "finished";
+                        $encounterresourcelocationextensionextension[]=$encounterresourcelocationextensionextension1;
+                        $encounterresourcelocationextensionextension[]=$encounterresourcelocationextensionextension2;
+
+                        $encounterresourcelocationextension['extension']   = $encounterresourcelocationextensionextension;
+                        $encounterresourcelocationextension['url']         = "https://fhir.kemkes.go.id/r4/StructureDefinition/ServiceClass";
+                        $encounterresourcelocationlocation['display']      = $locationname;
+                        $encounterresourcelocationlocation['reference']    = "Location/".$locationid;
+                        $encounterresourcelocationperiod['end']            = $a->FINISH;
+                        $encounterresourcelocationperiod['start']          = $a->PERIODSTART;
+                        $encounterresourceparticipanttypecoding['code']    = "ATND";
+                        $encounterresourceparticipanttypecoding['display'] = "attender";
+                        $encounterresourceparticipanttypecoding['system']  = "http://terminology.hl7.org/CodeSystem/v3-ParticipationType";
+
+                        $encounterresourceclass['code']                          = "AMB";
+                        $encounterresourceclass['display']                       = "ambulatory";
+                        $encounterresourceclass['system']                        = "http://terminology.hl7.org/CodeSystem/v3-ActCode";
+                        $encounterresourceidentifier['system']                   = "http://sys-ids.kemkes.go.id/encounter/".RS_ID;
+                        $encounterresourceidentifier['value']                    = $episodeid;
+                        $encounterresourcelocation['extension'][]                = $encounterresourcelocationextension;
+                        $encounterresourcelocation['location']                   = $encounterresourcelocationlocation;
+                        $encounterresourcelocation['period']                     = $encounterresourcelocationperiod;
+                        $encounterresourceparticipant['individual']['display']   = $practitionername;
+                        $encounterresourceparticipant['individual']['reference'] = "Practitioner/".$practitionerid;
+                        $encounterresourceparticipant['type'][]['coding'][]      = $encounterresourceparticipanttypecoding;
+
+                        $encounterresource['class']                        = $encounterresourceclass;
+                        $encounterresource['diagnosis']                    = $diagnosis;
+                        $encounterresource['identifier'][]                 = $encounterresourceidentifier;
+                        $encounterresource['location'][]                   = $encounterresourcelocation;
+                        $encounterresource['participant'][]                = $encounterresourceparticipant;
+                        $encounterresource['period']['end']                = $a->FINISH;
+                        $encounterresource['period']['start']              = $a->PERIODSTART;
+                        $encounterresource['resourceType']                 = "Encounter";
+                        $encounterresource['serviceProvider']['reference'] = "Organization/".RS_ID;
+                        $encounterresource['status']                       = "finished";
                         if($a->PERIODSTART!=null){
                             $statusHistoryperiodstart['period']['start'] = $a->PERIODSTART;
                             $statusHistoryperiodstart['period']['end']   = $a->PERIODSTART;
                             $statusHistoryperiodstart['status']          = "arrived";
-                            $resource['statusHistory'][]                 = $statusHistoryperiodstart;
+                            $encounterresource['statusHistory'][]        = $statusHistoryperiodstart;
+                        }
+                        if($a->TRIAGE!=null){
+                            $statusHistorytriage['period']['start'] = $a->TRIAGE;
+                            $statusHistorytriage['period']['end']   = $a->TRIAGE;
+                            $statusHistorytriage['status']          = "triaged";
+                            $encounterresource['statusHistory'][]   = $statusHistorytriage;
                         }
                         if($a->FINISH!=null){
                             $statusHistoryfinish['period']['start'] = $a->FINISH;
                             $statusHistoryfinish['period']['end']   = $a->FINISH;
                             $statusHistoryfinish['status']          = "finished";
-                            $resource['statusHistory'][]            = $statusHistoryfinish;
+                            $encounterresource['statusHistory'][]   = $statusHistoryfinish;
                         }
-                        $resource['subject']['display']   = $patientname;
-                        $resource['subject']['reference'] = "Patient/".$patientid;
+                        $encounterresource['subject']['display']   = $patientname;
+                        $encounterresource['subject']['reference'] = "Patient/".$patientid;
 
                         $encounter['fullUrl']           = "urn:uuid:".$uuidencounter;
                         $encounter['request']['method'] = "POST";
                         $encounter['request']['url']    = "Encounter";
-                        $encounter['resource']          = $resource;
-
+                        $encounter['resource']          = $encounterresource;
+                        
                         $body['resourceType'] = "Bundle";
                         $body['type']         = "transaction";
                         $body['entry'][]      = $encounter;
@@ -578,153 +608,111 @@
 
                         $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
-                        if(isset($response['entry'])){
-                            foreach($response['entry'] as $entrys){
-                                $simpanlog = [];
-
-                                $simpanlog['PASIEN_ID']     = $pasienid;
-                                $simpanlog['EPISODE_ID']    = $episodeid;
-                                $simpanlog['POLI_ID']       = $poliid;
-                                $simpanlog['DOKTER_ID']     = $dokterid;
-                                $simpanlog['IDENTIFIER']    = $episodeid;
-                                $simpanlog['LOCATION']      = $entrys['response']['location'];
-                                $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
-                                $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
-                                $simpanlog['ETAG']          = $entrys['response']['etag'];
-                                $simpanlog['STATUS']        = $entrys['response']['status'];
-                                $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
-                                $simpanlog['JENIS']         = "2";
-                                $simpanlog['ENVIRONMENT']   = SERVER;
-                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-    
-                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
-
-                                if(empty($resultcekdataresouce)){
-                                    $this->mss->insertdata($simpanlog);
-                                }
-                                
-
-                                $statusColor = "green";
-                                $statusMsg   = "Success";
-                                echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
-                            } 
+                        if($response === null){
+                            echo formatlogbundle($pasienid,$episodeid,"Encounter","********", "ERROR | response | NULL response from SATUSEHAT","red");
                         }else{
-                            if($response === null){
-                                $statusColor = "red";
-                                echo formatlogbundle($pasienid,$episodeid,'Encounter','','ERROR | response | NULL response from SATUSEHAT',$statusColor);
-                            }else{
-                                if(isset($response['fault'])){
-                                    $faultString = $response['fault']['faultstring'] ?? 'Unknown fault';
-                                    $errorCode   = $response['fault']['detail']['errorcode'] ?? 'unknown';
-                                    $statusColor = 'red';
-                                    $statusMsg   = 'FAULT | ' . $errorCode . ' | ' . $faultString;
+                            if(isset($response['entry'])){
+                                foreach($response['entry'] as $entrys){
+                                    $simpanlog = [];
 
-                                    echo formatlogbundle($pasienid,$episodeid,'Encounter','',$statusMsg,$statusColor);
-                                }else{
-                                    if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
-                                        
-                                        foreach ($response['issue'] as $issues) {
-                                            if($issues['code']!="duplicate"){
-                                                $statusColor = "";
-                                                $severity    = $issues['severity'] ?? 'unknown';
-                                                $code        = $issues['code'] ?? '-';
-                                                $text        = $issues['details']['text'] ?? '-';
-                                                $diagnostics = $issues['diagnostics'] ?? $text;
-                                                $expression  = $issues['expression'][0] ?? '-';
+                                    $simpanlog['PASIEN_ID']     = $pasienid;
+                                    $simpanlog['EPISODE_ID']    = $episodeid;
+                                    $simpanlog['POLI_ID']       = $poliid;
+                                    $simpanlog['DOKTER_ID']     = $dokterid;
+                                    $simpanlog['IDENTIFIER']    = $episodeid;
+                                    $simpanlog['LOCATION']      = $entrys['response']['location'];
+                                    $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
+                                    $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
+                                    $simpanlog['ETAG']          = $entrys['response']['etag'];
+                                    $simpanlog['STATUS']        = $entrys['response']['status'];
+                                    $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                    $simpanlog['JENIS']         = "2";
+                                    $simpanlog['ENVIRONMENT']   = SERVER;
+                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+        
+                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
 
-                                                switch ($severity) {
-                                                    case 'error':
-                                                        $statusColor = 'red';
-                                                        break;
-                                                    case 'warning':
-                                                        $statusColor = 'yellow';
-                                                        break;
-                                                    default:
-                                                        $statusColor = 'white';
-                                                }
-
-                                                $statusMsg = $expression;
-                                                echo formatlogbundle($pasienid,$episodeid,'Encounter','',$statusMsg,$statusColor);
-                                            }
-                                            
-                                        }
+                                    if(empty($resultcekdataresouce)){
+                                        $this->mss->insertdata($simpanlog);
                                     }
+                                    
+                                    $statusColor = "green";
+                                    $statusMsg   = "Success";
+                                    echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
+                                } 
+                            }else{
+                                if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
+                                    if($response['issue'][0]['code']==="duplicate"){
+                                        $responsegetencounter = [];
+                                        $responsegetencounter = Satusehat::getdata("Encounter","identifier",$episodeid,$this->oauth['access_token']);
 
-                                    if(isset($response['issue'])){
-                                        if($response['issue'][0]['code']==="duplicate"){
-                                            $responsegetencounter          = [];
-                                            $responsegetcondition          = [];
-                                            $responsegetconditionencounter = [];
+                                        if(isset($responsegetencounter['entry'])){
+                                            foreach($responsegetencounter['entry'] as $responsegetencounters){
+                                                $simpanlog = [];
 
-                                            $responsegetencounter = Satusehat::getdata("Encounter","identifier",$episodeid,$this->oauth['access_token']);
-                                            $responsegetcondition = Satusehat::getdata("Condition","identifier",$episodeid,$this->oauth['access_token']); 
+                                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                                $simpanlog['POLI_ID']       = $poliid;
+                                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                                $simpanlog['IDENTIFIER']    = $episodeid;
+                                                $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
+                                                $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
+                                                $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
+                                                $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
+                                                $simpanlog['STATUS']        = "201 Created";
+                                                $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
+                                                $simpanlog['JENIS']         = "2";
+                                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                    
+                                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
 
-                                            if(isset($responsegetencounter['entry'])){
-                                                foreach($responsegetencounter['entry'] as $responsegetencounters){
-                                                    $simpanlog=[];
-
-                                                    $simpanlog['PASIEN_ID']     = $pasienid;
-                                                    $simpanlog['EPISODE_ID']    = $episodeid;
-                                                    $simpanlog['POLI_ID']       = $poliid;
-                                                    $simpanlog['DOKTER_ID']     = $dokterid;
-                                                    $simpanlog['IDENTIFIER']    = $episodeid;
-                                                    $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
-                                                    $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
-                                                    $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
-                                                    $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
-                                                    $simpanlog['STATUS']        = "201 Created";
-                                                    $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
-                                                    $simpanlog['JENIS']         = "2";
-                                                    $simpanlog['ENVIRONMENT']   = SERVER;
-                                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                                    
-                                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
-
-                                                    if(empty($resultcekdataresouce)){
-                                                        $this->mss->insertdata($simpanlog);
-                                                    }
-
-                                                    $statusColor = "yellow";
-                                                    $statusMsg   = "GET ENCOUNTER BY EPISODE ID";
-                                                    echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
+                                                if(empty($resultcekdataresouce)){
+                                                    $this->mss->insertdata($simpanlog);
                                                 }
-                                            }
-
-                                            if(isset($responsegetcondition['entry'])){
-                                                foreach($responsegetcondition['entry'] as $responsegetconditions){
-                                                    $simpanlog=[];
-
-                                                    $simpanlog['PASIEN_ID']     = $pasienid;
-                                                    $simpanlog['EPISODE_ID']    = $episodeid;
-                                                    $simpanlog['POLI_ID']       = $poliid;
-                                                    $simpanlog['DOKTER_ID']     = $dokterid;
-                                                    $simpanlog['IDENTIFIER']    = $episodeid;
-                                                    $simpanlog['LOCATION']      = $responsegetconditions['fullUrl']."/_history/".trim($responsegetconditions['resource']['meta']['versionId'], 'W/"');
-                                                    $simpanlog['RESOURCE_TYPE'] = $responsegetconditions['resource']['resourceType'];
-                                                    $simpanlog['RESOURCE_ID']   = $responsegetconditions['resource']['id'];
-                                                    $simpanlog['ETAG']          = 'W/"' . $responsegetconditions['resource']['meta']['versionId'] . '"';
-                                                    $simpanlog['STATUS']        = "201 Created";
-                                                    $simpanlog['LAST_MODIFIED'] = $responsegetconditions['resource']['meta']['lastUpdated'];
-                                                    $simpanlog['JENIS']         = "2";
-                                                    $simpanlog['ENVIRONMENT']   = SERVER;
-                                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
-                                                    
-                                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id']);
-
-                                                    if(empty($resultcekdataresouce)){
-                                                        $this->mss->insertdata($simpanlog);
-                                                    }
-
-                                                    $statusColor = "yellow";
-                                                    $statusMsg   = "GET CONDITION BY EPISODE ID";
-                                                    echo formatlogbundle($pasienid,$episodeid,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id'], $statusMsg,$statusColor);
-                                                }
+                                                
+                                                $statusColor = "yellow";
+                                                $statusMsg   = "Duplicate | Encounter | Success Save Log Transaction";
+                                                echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
                                             }
                                         }
+
+                                        $responsegetcondition = [];
+                                        $responsegetcondition = Satusehat::getdata("Condition","identifier",$episodeid,$this->oauth['access_token']);
+
+                                        if(isset($responsegetcondition['entry'])){
+                                            foreach($responsegetcondition['entry'] as $responsegetconditions){
+                                                $simpanlog = [];
+
+                                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                                $simpanlog['POLI_ID']       = $poliid;
+                                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                                $simpanlog['IDENTIFIER']    = $episodeid;
+                                                $simpanlog['LOCATION']      = $responsegetconditions['fullUrl']."/_history/".trim($responsegetconditions['resource']['meta']['versionId'], 'W/"');
+                                                $simpanlog['RESOURCE_TYPE'] = $responsegetconditions['resource']['resourceType'];
+                                                $simpanlog['RESOURCE_ID']   = $responsegetconditions['resource']['id'];
+                                                $simpanlog['ETAG']          = 'W/"' . $responsegetconditions['resource']['meta']['versionId'] . '"';
+                                                $simpanlog['STATUS']        = "201 Created";
+                                                $simpanlog['LAST_MODIFIED'] = $responsegetconditions['resource']['meta']['lastUpdated'];
+                                                $simpanlog['JENIS']         = "2";
+                                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                    
+                                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id']);
+
+                                                if(empty($resultcekdataresouce)){
+                                                    $this->mss->insertdata($simpanlog);
+                                                }
+                                                
+                                                $statusColor = "yellow";
+                                                $statusMsg   = "Duplicate | Condition | Success Save Log Transaction";
+                                                echo formatlogbundle($pasienid,$episodeid,$responsegetconditions['resource']['resourceType'],$responsegetconditions['resource']['id'], $statusMsg,$statusColor);
+                                            }
+                                        }
+
                                     }
                                 }
-
-                                
                             }
                         }
                     }
@@ -735,6 +723,7 @@
                 echo color('red').self::$oauth['issue'][0]['details']['text'];
             }
         }
+
     }
 
 ?>

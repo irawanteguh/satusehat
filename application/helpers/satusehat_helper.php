@@ -5,13 +5,12 @@
     define('WIDTH_CONSENT_DATE', 22);
     define('WIDTH_SATUSEHATID', 38);
     define('WIDTH_RESOURCE_TYPE', 20);
-    define('WIDTH_MESSAGE', 20);
+    define('WIDTH_MESSAGE', 100);
 
     function headerpasien(){
         echo PHP_EOL;
         echo color('cyan').str_pad("TIMESTAMP", WIDTH_TIMESTAMP).str_pad("NO_IDENTITAS", WIDTH_NO_IDENTITAS).str_pad("SATUSEHAT_ID", WIDTH_SATUSEHATID).str_pad("MESSAGE", WIDTH_MESSAGE).PHP_EOL;
     }
-
 
     function headerbundle(){
         echo PHP_EOL;
@@ -31,7 +30,7 @@
 
     function formatlogbundle($parameter1,$parameter2,$parameter3,$parameter4,$message,$colorIdentity='cyan'){
         $reset   = color('reset');
-        $message = mb_strlen($message) > 10 ? mb_substr($message, 0, 10, 'UTF-8') . '...' : $message;
+        $message = mb_strlen($message) > 100 ? mb_substr($message, 0, 100, 'UTF-8') . '...' : $message;
 
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;

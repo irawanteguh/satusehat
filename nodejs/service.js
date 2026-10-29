@@ -2,7 +2,7 @@ import os from "os";
 import fetch from "node-fetch";
 import chalk from "chalk";
 
-let lebar             = 135;
+let lebar             = 150;
 let host              = "localhost";
 let isRunningServices = false;
 
@@ -17,8 +17,8 @@ for (const iface of Object.values(interfaces)) {
     }
 }
 
-// const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
-const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
+const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
+// const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
 
 function getTimeStamp() {
   const now = new Date();
@@ -32,19 +32,10 @@ function printHeader() {
     console.log(chalk.cyan("=".repeat(lebar)));
 }
 
-function formatLog(
-    timestamp,
-    method,
-    endpoint,
-    status,
-    message,
-    widths = { ts: 40, method: 10, endpoint: 30, status: 12 },
-    colors = { ts: "white", method: "yellow", endpoint: "cyan", status: "auto", message: "white" }
-) {
-    // Fungsi bantu untuk dapatkan warna dari chalk secara dinamis
+function formatLog( timestamp, method, endpoint, status, message, widths = { ts: 40, method: 10, endpoint: 30, status: 12 }, colors = { ts: "white", method: "yellow", endpoint: "cyan", status: "auto", message: "white" }){
+
     const colorize = (text, color) => {
         if (color === "auto") {
-            // Otomatis hijau untuk 2xx, merah untuk lainnya
             const statusNum = Number(status);
             const statusColor = (statusNum >= 200 && statusNum < 300) ? "green" : "red";
             return chalk[statusColor](text);
@@ -97,91 +88,51 @@ async function callAPI(endpoint, method = "GET", body = null) {
         // }
 
         if (!response.ok) {
-
-            console.log(
-                formatLog(
-                    getTimeStamp(),
-                    method,
-                    endpoint,
-                    response.status,
-                    response.statusText
-                )
-            );
-
+            console.log(formatLog(getTimeStamp(),method,endpoint,response.status,response.statusText));
             console.log(chalk.red("*".repeat(lebar)));
             console.log(chalk.red(text)); // tampilkan full response
             console.log(chalk.red("*".repeat(lebar)));
-
             return;
         }
 
         try{
             const data = JSON.parse(text);
 
-            console.log(
-                formatLog(
-                    getTimeStamp(),
-                    method,
-                    endpoint,
-                    response.status,
-                    response.statusText,
-                    { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
-                    { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
-                )
-            );
-
+            console.log(formatLog(getTimeStamp(), method, endpoint, response.status, response.statusText, { ts: 40, method: 10, endpoint: 30, status: 12 }, { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" }));
             console.log(data);
+
         }catch{
             const match   = text.match(/<strong>Message:<\/strong>\s*([^<]+)/i);
             const message = match ? match[1].trim() : text;
 
-            console.log(
-                formatLog(
-                    getTimeStamp(),
-                    method,
-                    endpoint,
-                    response.status,
-                    response.statusText,
-                    { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
-                    { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
-                )
-            );
-
+            console.log(formatLog(getTimeStamp(), method, endpoint, response.status, response.statusText, { ts: 40, method: 10, endpoint: 30, status: 12 }, { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" }));
             console.log(chalk.red(message));
         }
     }catch(error){
-        console.log(
-            formatLog(
-                getTimeStamp(),
-                method,
-                endpoint,
-                "Network Error",
-                error.message,
-                { ts: 40, method: 10, endpoint: 30, status: 12 }, // custom width
-                { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" } // custom warna
-            )
-        );
+        console.log(formatLog(getTimeStamp(), method, endpoint, "Network Error", error.message, { ts: 40, method: 10, endpoint: 30, status: 12 }, { ts: "white", method: "yellow", endpoint: "yellow", status: "auto", message: "auto" }));
     }
 }
 
 async function runservices() {
     await callAPI("patientid", "POST");
     await callAPI("poliklinik", "POST");
-    await callAPI("anamnesaawalrj", "POST");
-    await callAPI("orderrad", "POST");
-    await callAPI("orderlab", "POST");
-    await callAPI("specimenlab", "POST");
-    await callAPI("hasillab", "POST");
-    await callAPI("diaglaboratorium", "POST");
-    await callAPI("careplan", "POST");
-    await callAPI("radiologi", "POST");
-    await callAPI("cipoliklinik", "POST");
-    await callAPI("compoliklinik", "POST");
-    await callAPI("singledose", "POST");
-    await callAPI("singledosereq", "POST");
     await callAPI("igd", "POST");
-    await callAPI("anamnesaawaligd", "POST");
-    await callAPI("psikologisigd", "POST");
+    
+    // await callAPI("anamnesaawalrj", "POST");
+    // await callAPI("orderrad", "POST");
+    // await callAPI("orderlab", "POST");
+    // await callAPI("specimenlab", "POST");
+    // await callAPI("hasillab", "POST");
+    // await callAPI("diaglaboratorium", "POST");
+    // await callAPI("careplan", "POST");
+    // await callAPI("radiologi", "POST");
+    // await callAPI("cipoliklinik", "POST");
+    // await callAPI("compoliklinik", "POST");
+    // await callAPI("singledose", "POST");
+    // await callAPI("singledosereq", "POST");
+    
+    // await callAPI("anamnesaawaligd", "POST");
+    // await callAPI("psikologisigd", "POST");
 }
 
 async function runservicesSafe() {

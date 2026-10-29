@@ -36,7 +36,6 @@
             $this->load->model("Modelpatient", "md");
         }
         
-
         public function patientid_post(){
             if(!isset(self::$oauth['issue'])){
                 $result = $this->md->datapasien();
@@ -55,31 +54,20 @@
                         $namapasien  = $a->NAMA;
                         $concentdate = $a->SATUSEHAT_DATE;
 
-                        if(SERVER==="production"){
-                            $response = Satusehat::getpatientid($noidentitas,$this->oauth['access_token']);
-                            if(isset($response['entry'][0]['resource']['id'])){
-                                $satusehatid = $response['entry'][0]['resource']['id'];
-
-                                $statusColor = "green";
-                                $statusMsg   = "OK";
-
-                                $data['SATUSEHAT_ID']=$satusehatid;
-                            }else{
-                                $satusehatid = "NOT FOUND";
-
-                                $statusColor = "red";
-                                $statusMsg   = "NOT FOUND";
-
-                                $data['SATUSEHAT_ID']=$satusehatid;
-                            }
+                        if(SERVER === "production"){
+                            $response             = Satusehat::getpatientid($noidentitas, $this->oauth['access_token']);
+                            $satusehatid          = $response['entry'][0]['resource']['id'] ?? 'NOT FOUND';
+                            $statusColor          = ($satusehatid !== 'NOT FOUND') ? 'green' : 'red';
+                            $statusMsg            = ($satusehatid !== 'NOT FOUND') ? 'OK' : 'NOT FOUND';
+                            $data['SATUSEHAT_ID'] = $satusehatid;
 
                             $this->md->updatedatapatient($pasienid,$data);
                         }else{
-                            $satusehatid = "MODE ENVIRONTMENT SANDBOX";
-
-                            $statusColor = "red";
-                            $statusMsg   = "MODE ENVIRONTMENT SANDBOX";
+                            $satusehatid          = "********";
+                            $statusColor          = "yellow";
+                            $statusMsg            = "Mode Development";
                         }
+
                         
                         echo formatlogpasien($pasienid,$noidentitas,$namapasien,$concentdate,$satusehatid,$statusMsg,$statusColor);
                     }

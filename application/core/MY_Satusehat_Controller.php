@@ -25,6 +25,9 @@ class MY_Satusehat_Controller extends REST_Controller{
 
         $this->oauth = Satusehat::generatedoauth();
 
-        headerbundle();
+        if(DEBUG === false){
+            headerbundle();
+        }
+        
     }
 }

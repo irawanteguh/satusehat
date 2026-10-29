@@ -6,14 +6,7 @@
                     "
                         SELECT *
                         FROM (
-                            -- Bagian 1: SATUSEHAT_ID IS NULL (dahulukan)
-                            SELECT A.PASIEN_ID,
-                                A.NO_IDENTITAS,
-                                A.NAMA,
-                                TO_CHAR(A.SATUSEHAT_DATE,'DD.MM.YYYY HH24:MI:SS') AS SATUSEHAT_DATE,
-                                A.SATUSEHAT_ID,
-                                1 AS PRIORITY,
-                                1 AS SORT_ORDER
+                            SELECT A.PASIEN_ID, A.NO_IDENTITAS, A.NAMA, TO_CHAR(A.SATUSEHAT_DATE,'DD.MM.YYYY HH24:MI:SS') AS SATUSEHAT_DATE, A.SATUSEHAT_ID, 1 AS PRIORITY, 1 AS SORT_ORDER
                             FROM SR01_GEN_PASIEN_MS A
                             WHERE A.LOKASI_ID = '001'
                             AND A.AKTIF = '1'
@@ -25,14 +18,7 @@
 
                             UNION ALL
 
-                            -- Bagian 2: SATUSEHAT_ID X / NOT FOUND (acak)
-                            SELECT A.PASIEN_ID,
-                                A.NO_IDENTITAS,
-                                A.NAMA,
-                                TO_CHAR(A.SATUSEHAT_DATE,'DD.MM.YYYY HH24:MI:SS') AS SATUSEHAT_DATE,
-                                A.SATUSEHAT_ID,
-                                2 AS PRIORITY,
-                                DBMS_RANDOM.VALUE AS SORT_ORDER
+                            SELECT A.PASIEN_ID, A.NO_IDENTITAS, A.NAMA, TO_CHAR(A.SATUSEHAT_DATE,'DD.MM.YYYY HH24:MI:SS') AS SATUSEHAT_DATE, A.SATUSEHAT_ID, 2 AS PRIORITY, DBMS_RANDOM.VALUE AS SORT_ORDER
                             FROM SR01_GEN_PASIEN_MS A
                             WHERE A.LOKASI_ID = '001'
                             AND A.AKTIF = '1'
@@ -44,7 +30,6 @@
                         )
                         ORDER BY PRIORITY, SORT_ORDER
                         FETCH FIRST 10 ROWS ONLY
-
                     ";
 
 			$recordset = $this->db->query($query);
@@ -57,6 +42,5 @@
             return $sql;
         }
         
-
     }
 ?>
