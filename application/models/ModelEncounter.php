@@ -92,7 +92,7 @@
                                     )
                                     AND R.EPISODE_ID = A.EPISODE_ID
                             )
-                            /*AND NOT EXISTS (
+                            AND NOT EXISTS (
                                 SELECT 1
                                 FROM SR01_SATUSEHAT_TRANSAKSI T
                                 WHERE T.LOKASI_ID = '001'
@@ -102,7 +102,7 @@
                                     AND T.ENVIRONMENT = '".$env."'
                                     AND T.PASIEN_ID = A.PASIEN_ID
                                     AND T.EPISODE_ID = A.EPISODE_ID
-                            )*/
+                            )
                             FETCH FIRST 10 ROWS ONLY
                         )
                         SELECT
@@ -304,7 +304,7 @@
                                     AND T.PASIEN_ID = A.PASIEN_ID
                                     AND T.EPISODE_ID = A.EPISODE_ID
                             )
-                            FETCH FIRST 1 ROWS ONLY
+                            FETCH FIRST 10 ROWS ONLY
                         )
                         SELECT
                             A.PASIEN_ID,
@@ -319,6 +319,7 @@
                             TO_CHAR(GREATEST(A.TGL_KELUAR, NVL(A.LAST_UPDATED_DATE, A.TGL_KELUAR)) - INTERVAL '7' HOUR, 'YYYY-MM-DD') || 'T' || TO_CHAR(GREATEST(A.TGL_KELUAR, NVL(A.LAST_UPDATED_DATE, A.TGL_KELUAR)) - INTERVAL '7' HOUR, 'HH24:MI:SS') || '+00:00' AS FINISH,
 
                             P.INT_PASIEN_ID AS PATIENTMR,
+                            P.NAMA AS PATIENTNAME,
                             P.SATUSEHAT_ID AS PATIENTID,
                             L.SATUSEHAT_ID AS LOCATIONID,
                             L.NAME AS LOCATIONNAME,
