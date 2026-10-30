@@ -190,6 +190,7 @@
                             FROM SR01_MED_TRIAGE_HD_V2
                             WHERE AKTIF = '1'
                             AND   ISMANUAL = 'E'
+                            AND   PSIKOLOGI<>5
                         )
 
                         SELECT A.PASIEN_ID, A.EPISODE_ID, A.RESOURCE_ID, A.POLI_ID, A.DOKTER_ID,
