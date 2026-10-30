@@ -30,7 +30,7 @@
 
     function formatlogbundle($parameter1,$parameter2,$parameter3,$parameter4,$message,$colorIdentity='cyan'){
         $reset      = color('reset');
-        $message    = mb_strlen($message) > 90 ? mb_substr($message, 0, 90, 'UTF-8') . '...' : $message;
+        $message    = mb_strlen($message) > 80 ? mb_substr($message, 0, 80, 'UTF-8') . '...' : $message;
         $parameter3 = mb_strlen($parameter3) > 25 ? mb_substr($parameter3, 0, 25, 'UTF-8') . '...' : $parameter3;
 
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
