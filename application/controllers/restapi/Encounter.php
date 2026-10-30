@@ -381,6 +381,12 @@
 
                                     }
                                 }
+
+                                if($response['issue'][0]['code']==="value"){
+                                    $statusColor = "red";
+                                    $statusMsg   = $response['issue'][0]['details']['text'];
+                                    echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
+                                }
                             }
                         }
                     }
@@ -714,6 +720,12 @@
                                         }
 
                                     }
+                                }
+
+                                if($response['issue'][0]['code']==="value"){
+                                    $statusColor = "red";
+                                    $statusMsg   = $response['issue'][0]['details']['text'];
+                                    echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                 }
                             }
                         }

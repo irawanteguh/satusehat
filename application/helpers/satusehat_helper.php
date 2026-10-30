@@ -4,7 +4,7 @@
     define('WIDTH_NAMA_PASIEN', 50);
     define('WIDTH_CONSENT_DATE', 22);
     define('WIDTH_SATUSEHATID', 38);
-    define('WIDTH_RESOURCE_TYPE', 20);
+    define('WIDTH_RESOURCE_TYPE', 30);
     define('WIDTH_MESSAGE', 100);
 
     function headerpasien(){
@@ -29,8 +29,9 @@
     }
 
     function formatlogbundle($parameter1,$parameter2,$parameter3,$parameter4,$message,$colorIdentity='cyan'){
-        $reset   = color('reset');
-        $message = mb_strlen($message) > 100 ? mb_substr($message, 0, 100, 'UTF-8') . '...' : $message;
+        $reset      = color('reset');
+        $message    = mb_strlen($message) > 90 ? mb_substr($message, 0, 90, 'UTF-8') . '...' : $message;
+        $parameter3 = mb_strlen($parameter3) > 25 ? mb_substr($parameter3, 0, 25, 'UTF-8') . '...' : $parameter3;
 
         $formatted  = color($colorIdentity) . str_pad(date('Y-m-d H:i:s'), WIDTH_TIMESTAMP) . $reset;
         $formatted .= color($colorIdentity) . str_pad($parameter2, WIDTH_NO_IDENTITAS) . $reset;

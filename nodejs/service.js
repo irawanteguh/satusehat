@@ -2,7 +2,7 @@ import os from "os";
 import fetch from "node-fetch";
 import chalk from "chalk";
 
-let lebar             = 150;
+let lebar             = 170;
 let host              = "localhost";
 let isRunningServices = false;
 
@@ -119,18 +119,22 @@ async function runservices() {
     await callAPI("igd", "POST");
 
 
-    //Observation
-    await callAPI("psikologisigd", "POST");
+    // //Observation
     await callAPI("anamnesaawalrj", "POST");
     await callAPI("anamnesaawaligd", "POST");
+    await callAPI("psikologisigd", "POST");
+    
+    
 
+    //CarePlan
+    await callAPI("careplanrj", "POST");
 
     // await callAPI("orderrad", "POST");
     // await callAPI("orderlab", "POST");
     // await callAPI("specimenlab", "POST");
     // await callAPI("hasillab", "POST");
     // await callAPI("diaglaboratorium", "POST");
-    // await callAPI("careplan", "POST");
+    
     // await callAPI("radiologi", "POST");
     // await callAPI("cipoliklinik", "POST");
     // await callAPI("compoliklinik", "POST");

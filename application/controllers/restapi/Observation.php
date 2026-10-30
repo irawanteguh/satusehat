@@ -361,7 +361,7 @@
                                 if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
                                     if($response['issue'][0]['code']==="duplicate"){
                                         $responsegetencounter = [];
-                                        $responsegetencounter = Satusehat::getdata("Observation","identifier",$episodeid,$this->oauth['access_token']);
+                                        $responsegetencounter = Satusehat::getdata("Observation","identifier",$transid,$this->oauth['access_token']);
 
                                         if(isset($responsegetencounter['entry'])){
                                             foreach($responsegetencounter['entry'] as $responsegetencounters){
@@ -393,6 +393,12 @@
                                                 echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
                                             }
                                         }
+                                    }
+
+                                    if($response['issue'][0]['code']==="value"){
+                                        $statusColor = "red";
+                                        $statusMsg   = $response['issue'][0]['details']['text'];
+                                        echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                     }
                                 }
                             }
@@ -749,6 +755,12 @@
                                             }
                                         }
                                     }
+
+                                    if($response['issue'][0]['code']==="value"){
+                                        $statusColor = "red";
+                                        $statusMsg   = $response['issue'][0]['details']['text'];
+                                        echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
+                                    }
                                 }
                             }
                         }
@@ -931,6 +943,12 @@
                                                 echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
                                             }
                                         }
+                                    }
+
+                                    if($response['issue'][0]['code']==="value"){
+                                        $statusColor = "red";
+                                        $statusMsg   = $response['issue'][0]['details']['text'];
+                                        echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                     }
                                 }
                             }
