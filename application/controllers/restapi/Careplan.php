@@ -130,88 +130,87 @@
                         $body['type']         = "transaction";
                         $body['entry'][]      = $careplan;
 
-                        $this->response($careplanresource);
 
-                        // $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
+                        $response = Satusehat::postbundle(json_encode($body),$this->oauth['access_token']);
 
-                        // if($response === null){
-                        //     echo formatlogbundle($pasienid,$episodeid,"CarePlan","********", "ERROR | response | NULL response from SATUSEHAT","red");
-                        // }else{
-                        //     if(isset($response['entry'])){
-                        //         foreach($response['entry'] as $entrys){
-                        //             $simpanlog = [];
+                        if($response === null){
+                            echo formatlogbundle($pasienid,$episodeid,"CarePlan","********", "ERROR | response | NULL response from SATUSEHAT","red");
+                        }else{
+                            if(isset($response['entry'])){
+                                foreach($response['entry'] as $entrys){
+                                    $simpanlog = [];
 
-                        //             $simpanlog['PASIEN_ID']     = $pasienid;
-                        //             $simpanlog['EPISODE_ID']    = $episodeid;
-                        //             $simpanlog['POLI_ID']       = $poliid;
-                        //             $simpanlog['DOKTER_ID']     = $dokterid;
-                        //             $simpanlog['IDENTIFIER']    = $transid;
-                        //             $simpanlog['LOCATION']      = $entrys['response']['location'];
-                        //             $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
-                        //             $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
-                        //             $simpanlog['ETAG']          = $entrys['response']['etag'];
-                        //             $simpanlog['STATUS']        = $entrys['response']['status'];
-                        //             $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
-                        //             $simpanlog['JENIS']         = "1";
-                        //             $simpanlog['ENVIRONMENT']   = SERVER;
-                        //             $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                                    $simpanlog['PASIEN_ID']     = $pasienid;
+                                    $simpanlog['EPISODE_ID']    = $episodeid;
+                                    $simpanlog['POLI_ID']       = $poliid;
+                                    $simpanlog['DOKTER_ID']     = $dokterid;
+                                    $simpanlog['IDENTIFIER']    = $transid;
+                                    $simpanlog['LOCATION']      = $entrys['response']['location'];
+                                    $simpanlog['RESOURCE_TYPE'] = $entrys['response']['resourceType'];
+                                    $simpanlog['RESOURCE_ID']   = $entrys['response']['resourceID'];
+                                    $simpanlog['ETAG']          = $entrys['response']['etag'];
+                                    $simpanlog['STATUS']        = $entrys['response']['status'];
+                                    $simpanlog['LAST_MODIFIED'] = $entrys['response']['lastModified'];
+                                    $simpanlog['JENIS']         = "1";
+                                    $simpanlog['ENVIRONMENT']   = SERVER;
+                                    $simpanlog['CREATED_BY']    = "MIDDLEWARE";
         
-                        //             $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
+                                    $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$entrys['response']['resourceType'],$entrys['response']['resourceID']);
 
-                        //             if(empty($resultcekdataresouce)){
-                        //                 $this->mss->insertdata($simpanlog);
-                        //             }
+                                    if(empty($resultcekdataresouce)){
+                                        $this->mss->insertdata($simpanlog);
+                                    }
                                     
-                        //             $statusColor = "green";
-                        //             $statusMsg   = "Success";
-                        //             echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
-                        //         } 
-                        //     }else{
-                        //         if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
-                        //             if($response['issue'][0]['code']==="duplicate"){
-                        //                 $responsegetencounter = [];
-                        //                 $responsegetencounter = Satusehat::getdata("CarePlan","identifier",$transid,$this->oauth['access_token']);
+                                    $statusColor = "green";
+                                    $statusMsg   = "Success";
+                                    echo formatlogbundle($pasienid,$episodeid,$entrys['response']['resourceType'],$entrys['response']['resourceID'], $statusMsg,$statusColor);
+                                } 
+                            }else{
+                                if(isset($response['issue']) && is_array($response['issue']) && count($response['issue']) > 0){
+                                    if($response['issue'][0]['code']==="duplicate"){
+                                        $responsegetencounter = [];
+                                        $responsegetencounter = Satusehat::getdata("CarePlan","identifier",$transid,$this->oauth['access_token']);
 
-                        //                 if(isset($responsegetencounter['entry'])){
-                        //                     foreach($responsegetencounter['entry'] as $responsegetencounters){
-                        //                         $simpanlog = [];
+                                        if(isset($responsegetencounter['entry'])){
+                                            foreach($responsegetencounter['entry'] as $responsegetencounters){
+                                                $simpanlog = [];
 
-                        //                         $simpanlog['PASIEN_ID']     = $pasienid;
-                        //                         $simpanlog['EPISODE_ID']    = $episodeid;
-                        //                         $simpanlog['POLI_ID']       = $poliid;
-                        //                         $simpanlog['DOKTER_ID']     = $dokterid;
-                        //                         $simpanlog['IDENTIFIER']    = $transid;
-                        //                         $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
-                        //                         $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
-                        //                         $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
-                        //                         $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
-                        //                         $simpanlog['STATUS']        = "201 Created";
-                        //                         $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
-                        //                         $simpanlog['JENIS']         = "1";
-                        //                         $simpanlog['ENVIRONMENT']   = SERVER;
-                        //                         $simpanlog['CREATED_BY']    = "MIDDLEWARE";
+                                                $simpanlog['PASIEN_ID']     = $pasienid;
+                                                $simpanlog['EPISODE_ID']    = $episodeid;
+                                                $simpanlog['POLI_ID']       = $poliid;
+                                                $simpanlog['DOKTER_ID']     = $dokterid;
+                                                $simpanlog['IDENTIFIER']    = $transid;
+                                                $simpanlog['LOCATION']      = $responsegetencounters['fullUrl']."/_history/".trim($responsegetencounters['resource']['meta']['versionId'], 'W/"');
+                                                $simpanlog['RESOURCE_TYPE'] = $responsegetencounters['resource']['resourceType'];
+                                                $simpanlog['RESOURCE_ID']   = $responsegetencounters['resource']['id'];
+                                                $simpanlog['ETAG']          = 'W/"' . $responsegetencounters['resource']['meta']['versionId'] . '"';
+                                                $simpanlog['STATUS']        = "201 Created";
+                                                $simpanlog['LAST_MODIFIED'] = $responsegetencounters['resource']['meta']['lastUpdated'];
+                                                $simpanlog['JENIS']         = "1";
+                                                $simpanlog['ENVIRONMENT']   = SERVER;
+                                                $simpanlog['CREATED_BY']    = "MIDDLEWARE";
                     
-                        //                         $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
+                                                $resultcekdataresouce = $this->mss->cekdataresouce(SERVER,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id']);
 
-                        //                         if(empty($resultcekdataresouce)){
-                        //                             $this->mss->insertdata($simpanlog);
-                        //                         }
+                                                if(empty($resultcekdataresouce)){
+                                                    $this->mss->insertdata($simpanlog);
+                                                }
                                                 
-                        //                         $statusColor = "yellow";
-                        //                         $statusMsg   = "Duplicate | CarePlan | Success Save Log Transaction";
-                        //                         echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
-                        //                     }
-                        //                 }
-                        //             }
+                                                $statusColor = "yellow";
+                                                $statusMsg   = "Duplicate | CarePlan | Success Save Log Transaction";
+                                                echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
+                                            }
+                                        }
+                                    }
 
-                        //             if($response['issue'][0]['code']==="value"){
-                        //                 $statusColor = "red";
-                        //                 $statusMsg   = $response['issue'][0]['details']['text'];
-                        //                 echo formatlogbundle($pasienid,$episodeid,"CarePlan","********", $statusMsg,$statusColor);
-                        //             }
-                        //         }
-                        //     }
-                        // }
+                                    if($response['issue'][0]['code']==="value"){
+                                        $statusColor = "red";
+                                        $statusMsg   = $response['issue'][0]['details']['text'];
+                                        echo formatlogbundle($pasienid,$episodeid,"CarePlan","********", $statusMsg,$statusColor);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }else{
                     echo color('red')."Data Tidak Ditemukan";
