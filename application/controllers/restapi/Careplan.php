@@ -103,18 +103,22 @@
                         $careplanresourcecategorycoding['system']  = "http://snomed.info/sct";
 
                         $careplanresourceauthor['display']   = $practitionername;
-                        $careplanresourceauthor['reference'] = "Practitioner/".$practitionerid;
-                        $careplanresourcecategory['coding'][] =$careplanresourcecategorycoding;
-                        $encounter['display']                = "Kunjungan Rawat Jalan Medical Record ".$mrpas.' Atasnama '.$patientname;
-                        $encounter['reference']              = "Encounter/".$a->RESOURCE_ID;
-                        $subject['display']                  = $patientname;
-                        $subject['reference']                = "Patient/".$patientid;
+                        $careplanresourceauthor['reference']  = "Practitioner/".$practitionerid;
+                        $careplanresourcecategory['coding'][] = $careplanresourcecategorycoding;
+                        $encounter['display']                 = "Kunjungan Rawat Jalan Medical Record ".$mrpas.' Atasnama '.$patientname;
+                        $encounter['reference']               = "Encounter/".$a->RESOURCE_ID;
+                        $subject['display']                   = $patientname;
+                        $subject['reference']                 = "Patient/".$patientid;
+                        $identifier['system']                 = "http://sys-ids.kemkes.go.id/observation/".RS_ID;
+                        $identifier['use']                    = "official";
+                        $identifier['value']                  = $transid;
                         
                         $careplanresource['author']       = $careplanresourceauthor;
                         $careplanresource['category'][]   = $careplanresourcecategory;
                         $careplanresource['created']      = $a->PERIODSTART;
                         $careplanresource['description']  = $a->CAREPLAN;
                         $careplanresource['encounter']    = $encounter;
+                        $careplanresource['identifier'][] = $identifier;
                         $careplanresource['intent']       = "plan";
                         $careplanresource['resourceType'] = "CarePlan";
                         $careplanresource['status']       = "active";
@@ -201,12 +205,10 @@
                                                 echo formatlogbundle($pasienid,$episodeid,$responsegetencounters['resource']['resourceType'],$responsegetencounters['resource']['id'], $statusMsg,$statusColor);
                                             }
                                         }
-                                    }
-
-                                    if($response['issue'][0]['code']==="value"){
+                                    }else{
                                         $statusColor = "red";
                                         $statusMsg   = $response['issue'][0]['details']['text'];
-                                        echo formatlogbundle($pasienid,$episodeid,"CarePlan","********", $statusMsg,$statusColor);
+                                        echo formatlogbundle($pasienid,$episodeid,"ClinicalImpression","********", $statusMsg,$statusColor);
                                     }
                                 }
                             }

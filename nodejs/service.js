@@ -17,8 +17,8 @@ for (const iface of Object.values(interfaces)) {
     }
 }
 
-// const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
-const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
+const BASE_URL = process.env.BASE_URL || `http://localhost/dataanalyst/satusehat/index.php/`;
+// const BASE_URL = process.env.BASE_URL || `http://192.168.200.41:8080/satusehat/index.php/`;
 
 function getTimeStamp() {
   const now = new Date();
@@ -114,20 +114,23 @@ async function callAPI(endpoint, method = "GET", body = null) {
 }
 
 async function runservices() {
-    await callAPI("patientid", "POST");
-    await callAPI("poliklinik", "POST");
-    await callAPI("igd", "POST");
+    // await callAPI("patientid", "POST");
+    // await callAPI("poliklinik", "POST");
+    // await callAPI("igd", "POST");
 
 
-    // //Observation
-    await callAPI("anamnesaawalrj", "POST");
-    await callAPI("anamnesaawaligd", "POST");
-    await callAPI("psikologisigd", "POST");
+    // // //Observation
+    // await callAPI("anamnesaawalrj", "POST");
+    // await callAPI("anamnesaawaligd", "POST");
+    // await callAPI("psikologisigd", "POST");
     
     
 
-    //CarePlan
-    await callAPI("careplanrj", "POST");
+    // //CarePlan
+    // await callAPI("careplanrj", "POST");
+
+    //ClinicalImpression
+    await callAPI("clinicalimpressionrjigd", "POST");
 
     // await callAPI("orderrad", "POST");
     // await callAPI("orderlab", "POST");

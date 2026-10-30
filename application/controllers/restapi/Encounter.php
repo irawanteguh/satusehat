@@ -167,6 +167,7 @@
                                 $conditionpostresource['onsetDateTime']              = $a->INPROGRESSEND;
                                 $conditionpostresource['recordedDate']               = $a->INPROGRESSEND;
                             }
+                            
                             $conditionpostresource['recorder']['display']        = $practitionername;
                             $conditionpostresource['recorder']['reference']      = "Practitioner/".$practitionerid;
                             $conditionpostresource['resourceType']               = "Condition";
@@ -381,13 +382,11 @@
                                             }
                                         }
 
+                                    }else{
+                                        $statusColor = "red";
+                                        $statusMsg   = $response['issue'][0]['details']['text'];
+                                        echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                     }
-                                }
-
-                                if($response['issue'][0]['code']==="value"){
-                                    $statusColor = "red";
-                                    $statusMsg   = $response['issue'][0]['details']['text'];
-                                    echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                 }
                             }
                         }
@@ -721,13 +720,11 @@
                                             }
                                         }
 
+                                    }else{
+                                        $statusColor = "red";
+                                        $statusMsg   = $response['issue'][0]['details']['text'];
+                                        echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                     }
-                                }
-
-                                if($response['issue'][0]['code']==="value"){
-                                    $statusColor = "red";
-                                    $statusMsg   = $response['issue'][0]['details']['text'];
-                                    echo formatlogbundle($pasienid,$episodeid,$response['issue'][0]['expression'][0],"********", $statusMsg,$statusColor);
                                 }
                             }
                         }

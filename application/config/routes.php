@@ -12,6 +12,8 @@
     $route['anamnesaawaligd'] = 'restapi/Observation/anamnesaawaligd';
     $route['psikologisigd']   = 'restapi/Observation/psikologisigd';
     $route['careplanrj']      = 'restapi/Careplan/careplanrj';
+
+    $route['clinicalimpressionrjigd']     = 'restapi/Clinicalimpression/clinicalimpressionrjigd';
     
     // $route['hasillab']         = 'restapi/Observation/hasillab';
     // $route['orderrad']         = 'restapi/Servicerequest/orderrad';
@@ -21,7 +23,7 @@
     // $route['diaglaboratorium'] = 'restapi/Diagnosticreport/laboratorium';
     
     // $route['radiologi']        = 'restapi/Procedure/radiologi';
-    // $route['cipoliklinik']     = 'restapi/Clinicalimpression/cipoliklinik';
+    
     // $route['compoliklinik']    = 'restapi/Composition/compoliklinik';
     // $route['singledose']       = 'restapi/Medication/singledose';
     // $route['singledosereq']    = 'restapi/Medicationrequest/singledose';

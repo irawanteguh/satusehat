@@ -64,7 +64,7 @@
                         AND D.IHS_ID IS NOT NULL
                         AND D.IHS_ID <> 'NOT FOUND'
                         AND 'SIRS01_' || UPPER(D.USER_ID) = UPPER(B.CREATED_BY)
-                        LEFT JOIN SR01_SATUSEHAT_LOCATION E
+                        JOIN SR01_SATUSEHAT_LOCATION E
                         ON E.LOKASI_ID = '001'
                         AND E.AKTIF = '1'
                         AND E.STATUS = 'active'
@@ -143,7 +143,7 @@
                         AND D.IHS_ID IS NOT NULL
                         AND D.IHS_ID <> 'NOT FOUND'
                         AND 'SIRS01_' || UPPER(D.USER_ID) = UPPER(B.CREATED_BY)
-                        LEFT JOIN SR01_SATUSEHAT_LOCATION E
+                        JOIN SR01_SATUSEHAT_LOCATION E
                         ON E.LOKASI_ID = '001'
                         AND E.AKTIF = '1'
                         AND E.STATUS = 'active'
@@ -221,7 +221,7 @@
                         AND D.IHS_ID IS NOT NULL
                         AND D.IHS_ID <> 'NOT FOUND'
                         AND 'SIRS01_' || UPPER(D.USER_ID) = UPPER(B.CREATED_BY)
-                        LEFT JOIN SR01_SATUSEHAT_LOCATION E
+                        JOIN SR01_SATUSEHAT_LOCATION E
                         ON E.LOKASI_ID = '001'
                         AND E.AKTIF = '1'
                         AND E.STATUS = 'active'
