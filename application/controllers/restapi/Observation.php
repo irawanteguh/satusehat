@@ -850,7 +850,7 @@
                         $identifier['system']                         = "http://sys-ids.kemkes.go.id/observation/".RS_ID;
                         $identifier['use']                            = "official";
                         $identifier['value']                          = $transid;
-                        $psikologiMapping                             = ['0' => ['386661006', 'Angry'], '1' => ['48694002', 'Feeling anxious'], '2' => ['48694002', 'Feeling anxious'], '3' => ['35489007', 'Depressive disorder'], '4' => ['48694002', 'Feeling anxious'], '5' => [' suicidal', 'Suicidal tendency'], '6' => ['17326005', 'Normal mental state']]; [$psiokologisresourcevalueCodeableConceptcoding['code'], $psiokologisresourcevalueCodeableConceptcoding['display']] = $psikologiMapping[(string) $a->PSIKOLOGI] ?? ['', '']; $psiokologisresourcevalueCodeableConceptcoding['system'] = "http://snomed.info/sct";
+                        $psikologiMapping                             = ['0' => ['386661006', 'Angry'], '1' => ['48694002', 'Feeling anxious'], '2' => ['48694002', 'Feeling anxious'], '3' => ['35489007', 'Depressive disorder'], '4' => ['48694002', 'Feeling anxious'], '5' => [' 6471006', 'Suicidal ideation'], '6' => ['17326005', 'Normal mental state']]; [$psiokologisresourcevalueCodeableConceptcoding['code'], $psiokologisresourcevalueCodeableConceptcoding['display']] = $psikologiMapping[(string) $a->PSIKOLOGI] ?? ['', '']; $psiokologisresourcevalueCodeableConceptcoding['system'] = "http://snomed.info/sct";
 
                         $psiokologisresource['category'][]['coding'][]           = $psiokologisresourcecategorycoding;
                         $psiokologisresource['code']['coding'][]                 = $psiokologisresourcecodecoding;
