@@ -245,7 +245,7 @@
                             $statusHistorytriage['status']          = "triaged";
                             $encounterresource['statusHistory'][]   = $statusHistorytriage;
                         }
-                        if($a->INPROGRESSSTART!=null && $a->INPROGRESSEND!=null && !str_ends_with($a->INPROGRESSSTART, 'T+00:00') && !str_ends_with($a->INPROGRESSEND, 'T+00:00')){
+                        if($a->INPROGRESSSTART!=null && $a->INPROGRESSEND!=null && $a->INPROGRESSSTART != 'T+00:00' && $a->INPROGRESSEND != 'T+00:00'){
                             $statusHistoryinprogress['period']['start'] = $a->INPROGRESSSTART;
                             if (strtotime($a->INPROGRESSEND) < strtotime($a->INPROGRESSSTART)) {
                                 $statusHistoryinprogress['period']['end'] = $a->INPROGRESSSTART;
