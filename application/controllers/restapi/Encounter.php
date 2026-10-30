@@ -163,8 +163,10 @@
                             $conditionpostresource['code']['coding'][]           = $conditionpostresourcecode;
                             $conditionpostresource['encounter']['reference']     = "urn:uuid:".$uuidencounter;
                             $conditionpostresource['identifier'][]               = $conditionpostresourceidentifier;
-                            $conditionpostresource['onsetDateTime']              = $a->INPROGRESSEND;
-                            $conditionpostresource['recordedDate']               = $a->INPROGRESSEND;
+                            if($a->INPROGRESSEND != 'T+00:00'){
+                                $conditionpostresource['onsetDateTime']              = $a->INPROGRESSEND;
+                                $conditionpostresource['recordedDate']               = $a->INPROGRESSEND;
+                            }
                             $conditionpostresource['recorder']['display']        = $practitionername;
                             $conditionpostresource['recorder']['reference']      = "Practitioner/".$practitionerid;
                             $conditionpostresource['resourceType']               = "Condition";
